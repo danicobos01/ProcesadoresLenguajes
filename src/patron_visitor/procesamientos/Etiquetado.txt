@@ -1,0 +1,125 @@
+package procesamientos;
+
+public class Etiquetado extends ProcesamientoPorDefecto{
+	private int etq = 0;
+	
+	
+	// Programa
+	
+	public void procesa(Programa prog) {
+		prog.etqi = etq;
+		if(prog.declaraciones() != null) {
+			prog.declaraciones().procesa(this);
+		}
+		prog.instrucciones().procesa(this);
+		prog.etqs = etq;
+	}
+	
+	// Declaraciones
+	
+	public void procesa(Decs_muchas decs) {
+		decs.declaraciones().procesa(this);
+		decs.declaracion().procesa(this);
+	}
+	
+	public void procesa(Decs_una decs) {
+		decs.declaracion().procesa(this);
+	}
+	
+	@Override
+	public void procesa(DecProc dec) {
+		dec.etqi = etq;
+		dec.bloque().procesa(this);
+		dec.etqs = etq;
+	}
+	
+	@Override
+	public void procesa(DecTipo dec) {
+	}
+	
+	@Override
+	public void procesa(DecVar dec) {
+	}
+	
+	// Instrucciones
+	
+	public void procesa(Insts_una insts) {
+		insts.etqi = etq;
+		insts.instruccion().procesa(this);
+		insts.etqs = etq;
+	}
+	
+	@Override
+	public void procesa(Lista_inst_empty lista_inst_empty) {
+		lista_inst_empty.etqi = etq;
+		lista_inst_empty.etqs = etq;
+	}
+	
+	@Override
+	public void procesa(Lista_inst_una lista_inst_una) {
+		lista_inst_una.etqi = etq;
+		lista_inst_una.instruccion().procesa(this);
+		lista_inst_una.etqs = etq;
+	}
+	
+	@Override
+	public void procesa(Lista_inst_muchas lista_inst_muchas) {
+		lista_inst_muchas.etqi = etq;
+		lista_inst_muchas.instrucciones().procesa(this);
+		lista_inst_muchas.instruccion().procesa(this);
+		lista_inst_muchas.etqs = etq;
+	}
+	
+	// Expresiones
+	
+	@Override
+	public void procesa(Lista_exp_empty lista_exp_empty) {
+	}
+	
+	@Override
+	public void procesa(Exp_muchas exp_muchas) {
+		exp_muchas.etqi = etq;
+		exp_muchas.expresiones().procesa(this);
+		exp_muchas.expresion().procesa(this);
+	}
+	
+	@Override
+	public void procesa(Exp_una exp_una) {
+		exp_una.etqi = etq;
+		exp_una.expresion().procesa(this);
+	}
+	
+	// Operadores
+	
+	public void procesa(Suma exp) {
+		exp.etqi = etq;
+		exp.arg0().procesa(this);
+		if (exp.arg0().esDesignador()) etq++;
+		exp.arg1().procesa(this);
+		if (exp.arg1().esDesignador()) etq++;
+		etq++;
+		exp.etqs = etq;
+	}
+	
+	public void procesa(LitReal exp) {
+		exp.etqi = etq;
+		etq++;
+		exp.etqs = etq;
+	}
+	
+	public void procesa(LitEnt exp) {
+		exp.etqi = etq;
+		etq++;
+		exp.etqs = etq;
+	}
+	
+	// Tipo
+	
+	@Override
+	public void procesa(Int int1) {
+	}
+	
+	@Override
+	public void procesa(Real real) {
+	}	
+}
