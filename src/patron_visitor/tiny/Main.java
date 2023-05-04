@@ -1,16 +1,16 @@
-package tiny;
+package patron_visitor.tiny;
 
-import c_ast_ascendente.AnalizadorLexico;
-import c_ast_ascendente.ConstructorAST;
-import asint.TinyASint.Prog;
-import c_ast_ascendente.ClaseLexica;
-import c_ast_ascendente.GestionErrores;
-import c_ast_ascendente.UnidadLexica;
+import patron_visitor.c_ast_ascendente.AnalizadorLexico;
+import patron_visitor.c_ast_ascendente.ConstructorAST;
+import patron_visitor.asint.TinyASint.Prog;
+import patron_visitor.c_ast_ascendente.ClaseLexica;
+import patron_visitor.c_ast_ascendente.GestionErrores;
+import patron_visitor.c_ast_ascendente.UnidadLexica;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import procesamientos.Evaluacion;
-import procesamientos.Impresion;
+import patron_visitor.procesamientos.Evaluacion;
+import patron_visitor.procesamientos.Impresion;
 
 public class Main {
    public static void main(String[] args) throws Exception {
@@ -18,13 +18,19 @@ public class Main {
          ejecuta_lexico(args[1]);
      }
      else {
+    	 
+    	 
          Prog prog = null;
+         /*
          if (args[0].equals("-asc"))
             prog = ejecuta_ascendente(args[1]);
          else if (args[0].equals("-desc"))
             prog = ejecuta_descendente(args[1]);
          else 
             prog = ejecuta_descendente_manual(args[1]);
+         */
+         
+         prog = new Prog_sin_decs(new ins_una(new Suma(new LitEnt("3"), new LitEnt("5")))));
          prog.procesa(new Impresion());
          prog.procesa(new Evaluacion());         
      }

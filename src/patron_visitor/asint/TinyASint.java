@@ -1,8 +1,9 @@
 package patron_visitor.asint;
 
+import java.util.Vector;
+
 public class TinyASint {
     
-
     public static abstract class Exp  {
        public Exp() {
        }   
@@ -280,6 +281,80 @@ public class TinyASint {
             return 2;
         }
     }
+    
+    public enum EnumTipo {
+		INT, REAL, STRING, BOOL, ID, POINTER, ARRAY, RECORD, ERROR, OK, NULL
+	}
+    
+    public static abstract class Tipo {
+    	public Tipo() {
+    		
+    	}
+    	
+    	public abstract void procesa(Procesamiento p);
+    	
+    	public abstract EnumTipo getTipo();
+    }
+    
+    public static class Int extends Tipo{
+    	
+    	public Int() {
+    		
+    	}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+
+		public EnumTipo getTipo() {
+			return EnumTipo.INT;
+		}
+    }
+    
+    public static class Real extends Tipo{
+    	
+    	public Real() {
+    		
+    	}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+
+		public EnumTipo getTipo() {
+			return EnumTipo.REAL;
+		}
+    }
+    
+    public static class Bool extends Tipo{
+    	
+    	public Bool() {
+    	
+    	}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+
+		public EnumTipo getTipo() {
+			return EnumTipo.BOOL;
+		}
+    }
+    
+    public static class String extends Tipo{
+    	
+    	public String() {
+    	}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+
+		public EnumTipo getTipo() {
+			return EnumTipo.STRING;
+		}
+    }
+    
     public static class Dec  {
         private StringLocalizado id;
         private StringLocalizado val;
@@ -325,6 +400,96 @@ public class TinyASint {
            p.procesa(this); 
         }     
     }
+    
+    
+    /*
+    public static abstract class Instruccion {
+    	public Instruccion() {
+    		
+    	}
+    	public abstract void procesa(Procesamiento p);
+    }
+    */
+    
+    
+    public static abstract class Instrucciones {
+    	public Instrucciones() {
+
+    	}
+    	public abstract void procesa(Procesamiento p);
+    }
+    
+    public static class ins_muchas extends Instrucciones{
+    	private Vector<Instrucciones> ins;
+    	private Instrucciones in;
+    	
+		public ins_muchas(Vector<Instrucciones> ins, Instrucciones in) {
+			super();
+			this.ins = ins;
+			this.in = in;
+		}
+		
+		public Vector<Instrucciones> ins() { return this.ins; }
+		
+		public Instrucciones in() { return this.in; }
+
+		
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+    	
+    }
+    
+    public static class ins_una extends Instrucciones{
+    	private Instrucciones in;
+    	
+		public ins_una(Instrucciones in) {
+			super();
+			this.in = in;
+		}
+		
+		public Instrucciones in() { return this.in; }
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+    	
+    }
+    
+    public static class ins_vacia extends Instrucciones{
+    	public ins_vacia() {
+    		super();
+    	}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+    }
+    
+    
+    
+    public static abstract class Pforms {
+    	private Tipo t;
+		private StringLocalizado id;
+
+		public Pforms(Tipo t, StringLocalizado id) {
+			this.id = id;
+			this.t = t;
+		}
+
+		public StringLocalizado id() {
+			return id;
+		}
+
+		public Tipo tipo() {
+			return t;
+		}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+    }
+    
     public static abstract class Prog  {
        public Prog() {
        }   
@@ -393,6 +558,15 @@ public class TinyASint {
     }
     public Decs decs_muchas(Decs decs, Dec dec) {
         return new Decs_muchas(decs,dec);
+    }
+    public Instrucciones ins_muchas(Instrucciones ins, Instruccion in) {
+    	return new ins_muchas(ins, in);
+    }
+    public Instrucciones ins_una(Instruccion in) {
+    	return new ins_una(in);
+    }
+    public Instrucciones ins_vacia() {
+    	return new ins_vacia();
     }
     public StringLocalizado str(String s, int fila, int col) {
         return new StringLocalizado(s,fila,col);
