@@ -1,16 +1,16 @@
-package asint;
+package patron_visitor.asint;
 
-import asint.TinyASint.Suma;
-import asint.TinyASint.Resta;
-import asint.TinyASint.Mul;
-import asint.TinyASint.Div;
-import asint.TinyASint.Id;
-import asint.TinyASint.Num;
-import asint.TinyASint.Dec;
-import asint.TinyASint.Decs_muchas;
-import asint.TinyASint.Decs_una;
-import asint.TinyASint.Prog_con_decs;
-import asint.TinyASint.Prog_sin_decs;
+import patron_visitor.asint.TinyASint.Suma;
+import patron_visitor.asint.TinyASint.Resta;
+import patron_visitor.asint.TinyASint.Mul;
+import patron_visitor.asint.TinyASint.Div;
+import patron_visitor.asint.TinyASint.Id;
+import patron_visitor.asint.TinyASint.Num;
+import patron_visitor.asint.TinyASint.Dec;
+import patron_visitor.asint.TinyASint.Decs_muchas;
+import patron_visitor.asint.TinyASint.Decs_una;
+import patron_visitor.asint.TinyASint.Prog_con_decs;
+import patron_visitor.asint.TinyASint.Prog_sin_decs;
 
 
 public class ProcesamientoPorDefecto implements Procesamiento {
@@ -24,5 +24,5 @@ public class ProcesamientoPorDefecto implements Procesamiento {
    public void procesa(Decs_muchas decs) {}
    public void procesa(Decs_una decs) {}
    public void procesa(Prog_sin_decs prog) {}    
-   public void procesa(Prog_con_decs prog) {}    
+   public void procesa(Prog_con_decs prog) {}   
 }

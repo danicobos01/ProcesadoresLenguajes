@@ -252,19 +252,28 @@ public class TinyASint {
     
     
     
-    public static class Num extends Exp {
-        private StringLocalizado num;
-        public Num(StringLocalizado num) {
+    public static class NumEnt extends Exp {
+        private StringLocalizado numEnt;
+        public NumEnt(StringLocalizado numEnt) {
             super();
-            this.num = num;
+            this.numEnt = numEnt;
         }
-        public StringLocalizado num() {return num;}
+        public StringLocalizado num() {return numEnt;}
         public void procesa(Procesamiento p) {
            p.procesa(this); 
         }     
-        public final int prioridad() {
-            return 2;
+    }
+    
+    public static class NumReal extends Exp {
+        private StringLocalizado numReal;
+        public NumReal(StringLocalizado numReal) {
+            super();
+            this.numReal = numReal;
         }
+        public StringLocalizado num() {return numReal;}
+        public void procesa(Procesamiento p) {
+           p.procesa(this); 
+        }     
     }
     
     public static class Id extends Exp {
@@ -277,9 +286,6 @@ public class TinyASint {
         public void procesa(Procesamiento p) {
            p.procesa(this); 
         }     
-        public final int prioridad() {
-            return 2;
-        }
     }
     
     public enum EnumTipo {
@@ -326,7 +332,7 @@ public class TinyASint {
 		}
     }
     
-    public static class Bool extends Tipo{
+    public static class Bool extends Tipo {
     	
     	public Bool() {
     	
@@ -355,6 +361,12 @@ public class TinyASint {
 		}
     }
     
+    public static class int extends Exp{
+    	
+    }
+    
+    
+    
     public static class Dec  {
         private StringLocalizado id;
         private StringLocalizado val;
@@ -375,6 +387,7 @@ public class TinyASint {
        }
        public abstract void procesa(Procesamiento p);
     }
+    
     public static class Decs_una extends Decs {
        private Dec dec; 
        public Decs_una(Dec dec) {
@@ -386,6 +399,7 @@ public class TinyASint {
            p.procesa(this); 
         }     
     }
+    
     public static class Decs_muchas extends Decs {
        private Dec dec;
        private Decs decs;
@@ -400,6 +414,89 @@ public class TinyASint {
            p.procesa(this); 
         }     
     }
+    
+    public static class DecVar extends Decs {
+    	StringLocalizado id; 
+    	Tipo tipo;
+    	public DecVar(StringLocalizado id, Tipo tipo) {
+    		this.id = id;
+    		this.tipo = tipo;
+    	}
+    	
+    	public StringLocalizado getId() {
+    		return this.id;
+    	}
+    	
+    	public Tipo getTipo() {
+    		return this.tipo;
+    	}
+		@Override
+		public void procesa(Procesamiento p) {
+			p.procesa(this)
+		}
+    	
+    }
+    
+    public static class DecTipo extends Decs {
+    	StringLocalizado id; 
+    	Tipo tipo;
+    	public DecTipo(StringLocalizado id, Tipo tipo) {
+    		this.id = id;
+    		this.tipo = tipo;
+    	}
+    	
+    	public StringLocalizado getId() {
+    		return this.id;
+    	}
+    	
+    	public Tipo getTipo() {
+    		return this.tipo;
+    	}
+		@Override
+		public void procesa(Procesamiento p) {
+			p.procesa(this)
+		}
+    	
+    }
+    
+    public static class DecProc extends Decs {
+    	StringLocalizado id; 
+    	Pforms pforms;
+    	Vector<Instrucciones> ins;
+    	Vector<Decs> decs;
+    	public DecProc(StringLocalizado id, Pforms pforms, Vector<Instrucciones> ins, Vector<Decs> decs) {
+    		this.id = id;
+    		this.pforms = pforms;
+    		this.ins = ins;
+    		this.decs = decs;
+    	}
+    	
+    	public StringLocalizado getId() {
+    		return this.id;
+    	}
+    	
+    	public Pforms getPforms() {
+    		return this.pforms;
+    	}
+    	
+    	public Vector<Instrucciones> getIns() {
+    		return this.ins;
+    	}
+    	
+    	public Vector<Decs> getDecs() {
+    		return this.decs;
+    	}
+    	
+		@Override
+		public void procesa(Procesamiento p) {
+			p.procesa(this)
+		}
+    	
+    }
+    
+    
+    
+    
     
     
     /*
@@ -467,6 +564,32 @@ public class TinyASint {
     }
     
     
+    public static class Asignacion extends Instrucciones{
+    	private Exp arg0;
+    	private Exp arg1;
+    	
+    	public Asignacion(Exp arg0, Exp arg1) {
+    		this.arg0 = arg0;
+    		this.arg1 = arg1;
+    	}
+    	
+    	public Exp getFirst() {
+    		return this.arg0;
+    	}
+    	
+    	public Exp getSecond() {
+    		return this.arg1;
+    	}
+
+		
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+    	
+    	
+    }
+    
+    
     
     public static abstract class Pforms {
     	private Tipo t;
@@ -491,30 +614,49 @@ public class TinyASint {
     }
     
     public static abstract class Prog  {
-       public Prog() {
-       }   
+    	
+    	private Decs decs;
+    	private Instrucciones ins;
+    	public Prog(Decs decs, Instrucciones ins) {
+    		this.decs = decs;
+    		this.ins = ins;
+    	}   
+    	
+    	public Prog(Instrucciones ins) {
+    		this.ins = ins;
+    		this.decs = null;
+    	}
+    	
+    	public Decs getDeclaraciones() {
+    		return this.decs;
+    	}
+    	
+    	public Instrucciones getInstrucciones() {
+    		return this.ins;
+    	}
+       
        public abstract void procesa(Procesamiento p); 
     }
     public static class Prog_sin_decs extends Prog {
-      private Exp exp;
-       public Prog_sin_decs(Exp exp) {
-          super();
-          this.exp = exp;
+      private Instrucciones ins;
+       public Prog_sin_decs(Instrucciones ins) {
+          super(ins);
+          this.ins = ins;
        }   
-       public Exp exp() {return exp;}
+       public Instrucciones ins() {return this.ins;}
        public void procesa(Procesamiento p) {
            p.procesa(this); 
         }     
     }
     public static class Prog_con_decs extends Prog {
-      private Exp exp;
+      private Instrucciones ins;
       private Decs decs;
-       public Prog_con_decs(Exp exp, Decs decs) {
-          super();
-          this.exp = exp;
+       public Prog_con_decs(Instrucciones ins, Decs decs) {
+          super(ins);
+          this.ins = ins;
           this.decs = decs;
        }   
-       public Exp exp() {return exp;}
+       public Instrucciones ins() {return this.ins;}
        public Decs decs() {return decs;}
        public void procesa(Procesamiento p) {
            p.procesa(this); 
@@ -522,11 +664,11 @@ public class TinyASint {
     }
 
      // Constructoras    
-    public Prog prog_con_decs(Exp exp, Decs decs) {
-        return new Prog_con_decs(exp,decs);
+    public Prog prog_con_decs(Instrucciones ins, Decs decs) {
+        return new Prog_con_decs(ins,decs);
     }
-    public Prog prog_sin_decs(Exp exp) {
-        return new Prog_sin_decs(exp);
+    public Prog prog_sin_decs(Instrucciones ins) {
+        return new Prog_sin_decs(ins);
     }
     public Exp suma(Exp arg0, Exp arg1) {
         return new Suma(arg0,arg1);
@@ -544,8 +686,11 @@ public class TinyASint {
     public Exp mod(Exp arg0, Exp arg1) {
         return new Mod(arg0,arg1);
     }
-    public Exp num(StringLocalizado num) {
-        return new Num(num);
+    public Exp numEnt(StringLocalizado num) {
+        return new NumEnt(num);
+    }
+    public Exp numReal(StringLocalizado num) {
+        return new NumReal(num);
     }
     public Exp id(StringLocalizado num) {
         return new Id(num);
@@ -559,6 +704,19 @@ public class TinyASint {
     public Decs decs_muchas(Decs decs, Dec dec) {
         return new Decs_muchas(decs,dec);
     }
+    
+    public Decs decVar(StringLocalizado id, Tipo tipo) {
+    	return new DecVar(id, tipo);
+    }
+    
+    public Decs decTipo(StringLocalizado id, Tipo tipo) {
+    	return new DecTipo(id, tipo);
+    }
+    
+    public Decs decProc(StringLocalizado id, Pforms pforms, Vector<Instrucciones> ins, Vector<Decs> decs) {
+    	return new DecProc(id, pforms, ins, decs);
+    }
+    
     public Instrucciones ins_muchas(Instrucciones ins, Instruccion in) {
     	return new ins_muchas(ins, in);
     }
@@ -567,6 +725,10 @@ public class TinyASint {
     }
     public Instrucciones ins_vacia() {
     	return new ins_vacia();
+    }
+    
+    public Instrucciones asignacion(Exp arg0, Exp arg1) {
+    	return new Asignacion(arg0, arg1);
     }
     public StringLocalizado str(String s, int fila, int col) {
         return new StringLocalizado(s,fila,col);

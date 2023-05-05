@@ -2,7 +2,7 @@ package patron_visitor.tiny;
 
 import patron_visitor.c_ast_ascendente.AnalizadorLexico;
 import patron_visitor.c_ast_ascendente.ConstructorAST;
-import patron_visitor.asint.TinyASint.Prog;
+import patron_visitor.asint.TinyASint.*;
 import patron_visitor.c_ast_ascendente.ClaseLexica;
 import patron_visitor.c_ast_ascendente.GestionErrores;
 import patron_visitor.c_ast_ascendente.UnidadLexica;
@@ -29,10 +29,9 @@ public class Main {
          else 
             prog = ejecuta_descendente_manual(args[1]);
          */
-         
-         prog = new Prog_sin_decs(new ins_una(new Suma(new LitEnt("3"), new LitEnt("5")))));
+         prog = new Prog_sin_decs(new ins_una(new Asignacion(new Id(new str("suma", 0, 0)), new Suma(new numEnt("3"), new numEnt("5")))))));
          prog.procesa(new Impresion());
-         prog.procesa(new Evaluacion());         
+         prog.procesa(new Evaluacion());
      }
    }
    
