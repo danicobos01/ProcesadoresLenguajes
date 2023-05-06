@@ -6,11 +6,16 @@ import patron_visitor.asint.TinyASint.*;
 import patron_visitor.c_ast_ascendente.ClaseLexica;
 import patron_visitor.c_ast_ascendente.GestionErrores;
 import patron_visitor.c_ast_ascendente.UnidadLexica;
+import patron_visitor.asint.TinyASint;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.lang.String;
+
+
 import patron_visitor.procesamientos.Evaluacion;
 import patron_visitor.procesamientos.Impresion;
+import patron_visitor.procesamientos.Vinculacion;
 
 public class Main {
    public static void main(String[] args) throws Exception {
@@ -29,13 +34,19 @@ public class Main {
          else 
             prog = ejecuta_descendente_manual(args[1]);
          */
-         prog = new Prog_sin_decs(new ins_una(new Asignacion(new Id(new str("suma", 0, 0)), new Suma(new numEnt("3"), new numEnt("5")))))));
+         
+         // Progama que asigna a "suma" el resultado de sumar 3 y 5
+         prog = new Prog_sin_decs(new Ins_una(new Asignacion(new Id(new StringLocalizado("suma")), 
+        		 new Suma(new NumEnt(new StringLocalizado("3")), new NumEnt((new StringLocalizado("5")))))));
          prog.procesa(new Impresion());
          prog.procesa(new Evaluacion());
+         prog.procesa(new Vinculacion());
      }
    }
-   
-   private static void ejecuta_lexico(String in) throws Exception {
+
+
+
+private static void ejecuta_lexico(String in) throws Exception {
      Reader input = new InputStreamReader(new FileInputStream(in));
      AnalizadorLexico alex = new AnalizadorLexico(input);
      GestionErrores errores = new GestionErrores();
@@ -61,5 +72,7 @@ public class Main {
      c_ast_descendente_manual.ConstructorAST constructorast = new c_ast_descendente_manual.ConstructorAST(input);
      return constructorast.Init();
    }
+   
+   private static 
 }   
    

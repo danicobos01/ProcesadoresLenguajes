@@ -4,8 +4,9 @@ import java.util.Vector;
 
 public class TinyASint {
     
-    public static abstract class Exp  {
+    public static abstract class Exp extends NodoAST{
        public Exp() {
+    	   super();
        }   
        public abstract int prioridad();
        public abstract void procesa(Procesamiento procesamiento);
@@ -19,6 +20,15 @@ public class TinyASint {
          this.s = s;
          this.fila = fila;
          this.col = col;
+     }
+     
+     public StringLocalizado(String s) {
+    	 this.s = s;
+     }
+     
+     public void setFilaCol(int fila, int col) {
+    	 this.col = col;
+    	 this.fila = fila;
      }
      public int fila() {return fila;}
      public int col() {return col;}
@@ -293,8 +303,9 @@ public class TinyASint {
 	}
     
     public static abstract class Tipo {
-    	public Tipo() {
-    		
+    	EnumTipo tipo;
+    	public Tipo(EnumTipo tipo) {
+    		this.tipo = tipo;
     	}
     	
     	public abstract void procesa(Procesamiento p);
@@ -305,7 +316,7 @@ public class TinyASint {
     public static class Int extends Tipo{
     	
     	public Int() {
-    		
+    		super(EnumTipo.INT);
     	}
 
 		public void procesa(Procesamiento p) {
@@ -320,7 +331,7 @@ public class TinyASint {
     public static class Real extends Tipo{
     	
     	public Real() {
-    		
+    		super(EnumTipo.REAL);
     	}
 
 		public void procesa(Procesamiento p) {
@@ -335,7 +346,7 @@ public class TinyASint {
     public static class Bool extends Tipo {
     	
     	public Bool() {
-    	
+    		super(EnumTipo.BOOL);
     	}
 
 		public void procesa(Procesamiento p) {
@@ -347,9 +358,10 @@ public class TinyASint {
 		}
     }
     
-    public static class String extends Tipo{
+    public static class StringTipo extends Tipo{
     	
-    	public String() {
+    	public StringTipo() {
+    		super(EnumTipo.STRING);
     	}
 
 		public void procesa(Procesamiento p) {
@@ -361,13 +373,14 @@ public class TinyASint {
 		}
     }
     
+    // ??
     public static class int extends Exp{
     	
     }
     
     
     
-    public static class Dec  {
+    public static class Dec extends NodoAST {
         private StringLocalizado id;
         private StringLocalizado val;
         public Dec(StringLocalizado id, StringLocalizado val) {
@@ -382,7 +395,7 @@ public class TinyASint {
     }
     
     
-    public static abstract class Decs {
+    public static abstract class Decs extends NodoAST{
        public Decs() {
        }
        public abstract void procesa(Procesamiento p);
@@ -509,18 +522,18 @@ public class TinyASint {
     */
     
     
-    public static abstract class Instrucciones {
+    public static abstract class Instrucciones extends NodoAST{
     	public Instrucciones() {
 
     	}
     	public abstract void procesa(Procesamiento p);
     }
     
-    public static class ins_muchas extends Instrucciones{
+    public static class Ins_muchas extends Instrucciones{
     	private Vector<Instrucciones> ins;
     	private Instrucciones in;
     	
-		public ins_muchas(Vector<Instrucciones> ins, Instrucciones in) {
+		public Ins_muchas(Vector<Instrucciones> ins, Instrucciones in) {
 			super();
 			this.ins = ins;
 			this.in = in;
@@ -537,10 +550,10 @@ public class TinyASint {
     	
     }
     
-    public static class ins_una extends Instrucciones{
+    public static class Ins_una extends Instrucciones{
     	private Instrucciones in;
     	
-		public ins_una(Instrucciones in) {
+		public Ins_una(Instrucciones in) {
 			super();
 			this.in = in;
 		}
@@ -553,8 +566,8 @@ public class TinyASint {
     	
     }
     
-    public static class ins_vacia extends Instrucciones{
-    	public ins_vacia() {
+    public static class Ins_vacia extends Instrucciones{
+    	public Ins_vacia() {
     		super();
     	}
 
@@ -591,7 +604,7 @@ public class TinyASint {
     
     
     
-    public static abstract class Pforms {
+    public static abstract class Pforms extends NodoAST {
     	private Tipo t;
 		private StringLocalizado id;
 
@@ -613,7 +626,7 @@ public class TinyASint {
 		}
     }
     
-    public static abstract class Prog  {
+    public static abstract class Prog  extends NodoAST{
     	
     	private Decs decs;
     	private Instrucciones ins;
@@ -663,7 +676,14 @@ public class TinyASint {
         }     
     }
 
-     // Constructoras    
+     // Constructoras   
+    public StringLocalizado strl(String s, int fila, int col) {
+        return new StringLocalizado(s,fila,col);
+    }
+    public StringLocalizado strl(String s) {
+        return new StringLocalizado(s);
+    }
+    
     public Prog prog_con_decs(Instrucciones ins, Decs decs) {
         return new Prog_con_decs(ins,decs);
     }
@@ -718,19 +738,17 @@ public class TinyASint {
     }
     
     public Instrucciones ins_muchas(Instrucciones ins, Instruccion in) {
-    	return new ins_muchas(ins, in);
+    	return new Ins_muchas(ins, in);
     }
     public Instrucciones ins_una(Instruccion in) {
-    	return new ins_una(in);
+    	return new Ins_una(in);
     }
     public Instrucciones ins_vacia() {
-    	return new ins_vacia();
+    	return new Ins_vacia();
     }
     
     public Instrucciones asignacion(Exp arg0, Exp arg1) {
     	return new Asignacion(arg0, arg1);
     }
-    public StringLocalizado str(String s, int fila, int col) {
-        return new StringLocalizado(s,fila,col);
-    }
+    
 }

@@ -66,21 +66,6 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		}
 	}
 	
-	private static class Nodo {
-		public int fila;
-		public int col;
-		public Dec d;
-
-		public Nodo(Dec d, StringLocalizado s) {
-			this.d = d;
-			this.fila = s.fila();
-			this.col = s.col();
-		}
-
-		public String toString() {
-			return Integer.toString(fila) + "-" + Integer.toString(col);
-		}
-	}
 	
 	private class VinculacionPointer extends ProcesamientoPorDefecto {
 
