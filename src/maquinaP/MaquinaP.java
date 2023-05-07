@@ -47,7 +47,7 @@ public class MaquinaP {
    
    // Aniadimos strings y reales:
    
-   private class ValorString extends Valor{
+   private class ValorString extends Valor {
 	   private String valor;
 	   public ValorString(String valor) {
 		   this.valor = valor;
@@ -462,7 +462,7 @@ public class MaquinaP {
    private IReadString IREADS;
    private class IReadString implements Instruccion {
       public void ejecuta() {
-    	 pilaEvaluacion.push(new ValorString(in.nextInt())); // ¿¿ nextString??
+    	 pilaEvaluacion.push(new ValorString(in.next()));
  		 pc++;
       } 
       public String toString() {return "write_string";};

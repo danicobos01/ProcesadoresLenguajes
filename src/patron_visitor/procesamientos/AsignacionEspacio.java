@@ -1,4 +1,4 @@
-
+import patron_visitor.asint.TinyASint.*;
 
 public class AsignacionEspacio extends ProcesamientoPorDefecto {
 	private int dir = 0;
@@ -6,11 +6,11 @@ public class AsignacionEspacio extends ProcesamientoPorDefecto {
 	
 	// Programa
 
-	public void procesa(Programa prog) {
-		if (prog.declaraciones() != null) {
-			prog.declaraciones().procesa(this);
+	public void procesa(Prog prog) {
+		if (prog.getDeclaraciones() != null) {
+			prog.getDeclaraciones().procesa(this);
 		}
-		prog.instrucciones().procesa(this);
+		prog.getInstrucciones().procesa(this);
 		prog.tam_datos = dir;
 	}
 	

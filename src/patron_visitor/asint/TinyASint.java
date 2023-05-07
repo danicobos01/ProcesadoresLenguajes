@@ -8,7 +8,7 @@ public class TinyASint {
        public Exp() {
     	   super();
        }   
-       public abstract int prioridad();
+       // public abstract int prioridad();
        public abstract void procesa(Procesamiento procesamiento);
     }
     
@@ -260,7 +260,61 @@ public class TinyASint {
     
     // Nivel 5: Operadores de indexaci�n, de acceso a registro y de indirecci�n.
     
+    public static class Index extends Exp{ // [ E ]
+    	
+    	public Index() {
+    		
+    	}
+    	
+    	public void procesa(Procesamiento p) {
+    		p.procesa(this);
+    	}
+    	
+    }
     
+    public static class AccesoRegistro extends Exp { // .c
+    	private Exp exp;
+		private StringLocalizado id;
+
+		public AccesoRegistro(Exp exp, StringLocalizado id) {
+			this.exp = exp;
+			this.id = id;
+		}
+
+		public Exp getExp() {
+			return this.exp;
+		}
+
+		public StringLocalizado getId() {
+			return this.id;
+		}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+    }
+    
+    public static class Indireccion extends Exp{ // ^
+    	private Exp exp;
+		private StringLocalizado id;
+
+		public Indireccion(Exp exp, StringLocalizado id) {
+			this.exp = exp;
+			this.id = id;
+		}
+
+		public Exp getExp() {
+			return this.exp;
+		}
+
+		public StringLocalizado getId() {
+			return this.id;
+		}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+    }
     
     public static class NumEnt extends Exp {
         private StringLocalizado numEnt;
@@ -374,9 +428,11 @@ public class TinyASint {
     }
     
     // ??
+    /*
     public static class int extends Exp{
     	
     }
+    */
     
     
     
@@ -395,7 +451,7 @@ public class TinyASint {
     }
     
     
-    public static abstract class Decs extends NodoAST{
+    public static abstract class Decs extends NodoAST {
        public Decs() {
        }
        public abstract void procesa(Procesamiento p);
@@ -445,7 +501,7 @@ public class TinyASint {
     	}
 		@Override
 		public void procesa(Procesamiento p) {
-			p.procesa(this)
+			p.procesa(this);
 		}
     	
     }
@@ -467,7 +523,7 @@ public class TinyASint {
     	}
 		@Override
 		public void procesa(Procesamiento p) {
-			p.procesa(this)
+			p.procesa(this);
 		}
     	
     }
@@ -502,7 +558,7 @@ public class TinyASint {
     	
 		@Override
 		public void procesa(Procesamiento p) {
-			p.procesa(this)
+			p.procesa(this);
 		}
     	
     }
@@ -604,7 +660,7 @@ public class TinyASint {
     
     
     
-    public static abstract class Pforms extends NodoAST {
+    public static abstract class Pforms extends Decs {
     	private Tipo t;
 		private StringLocalizado id;
 
@@ -624,6 +680,31 @@ public class TinyASint {
 		public void procesa(Procesamiento p) {
 			p.procesa(this);
 		}
+    }
+    
+    public static class Pf_muchos extends Pforms{
+    	Vector<Pforms> pforms;
+    	Pforms pform;
+		public Pf_muchos(Tipo t, StringLocalizado id) {
+			super(t, id);
+		}
+    	
+    }
+    
+    public static class Pf_uno extends Pforms{
+    	Pforms pform;
+		public Pf_uno(Tipo t, StringLocalizado id) {
+			super(t, id);
+		}
+    	
+    }
+    
+    public static class Pf_vacio extends Pforms{
+    	
+		public Pf_vacio(Tipo t, StringLocalizado id) {
+			super(t, id);
+		}
+    	
     }
     
     public static abstract class Prog  extends NodoAST{
@@ -737,10 +818,10 @@ public class TinyASint {
     	return new DecProc(id, pforms, ins, decs);
     }
     
-    public Instrucciones ins_muchas(Instrucciones ins, Instruccion in) {
+    public Instrucciones ins_muchas(Vector<Instrucciones> ins, Instrucciones in) {
     	return new Ins_muchas(ins, in);
     }
-    public Instrucciones ins_una(Instruccion in) {
+    public Instrucciones ins_una(Instrucciones in) {
     	return new Ins_una(in);
     }
     public Instrucciones ins_vacia() {

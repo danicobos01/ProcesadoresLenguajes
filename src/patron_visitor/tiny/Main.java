@@ -20,7 +20,7 @@ import patron_visitor.procesamientos.Vinculacion;
 public class Main {
    public static void main(String[] args) throws Exception {
      if (args[0].equals("-lex")) {  
-         ejecuta_lexico(args[1]);
+         // ejecuta_lexico(args[1]);
      }
      else {
     	 
@@ -38,14 +38,14 @@ public class Main {
          // Progama que asigna a "suma" el resultado de sumar 3 y 5
          prog = new Prog_sin_decs(new Ins_una(new Asignacion(new Id(new StringLocalizado("suma")), 
         		 new Suma(new NumEnt(new StringLocalizado("3")), new NumEnt((new StringLocalizado("5")))))));
-         prog.procesa(new Impresion());
-         prog.procesa(new Evaluacion());
+        // prog.procesa(new Impresion());
+         // prog.procesa(new Evaluacion());
          prog.procesa(new Vinculacion());
      }
    }
 
 
-
+/*
 private static void ejecuta_lexico(String in) throws Exception {
      Reader input = new InputStreamReader(new FileInputStream(in));
      AnalizadorLexico alex = new AnalizadorLexico(input);
@@ -72,7 +72,8 @@ private static void ejecuta_lexico(String in) throws Exception {
      c_ast_descendente_manual.ConstructorAST constructorast = new c_ast_descendente_manual.ConstructorAST(input);
      return constructorast.Init();
    }
+  */
    
-   private static 
+   
 }   
    

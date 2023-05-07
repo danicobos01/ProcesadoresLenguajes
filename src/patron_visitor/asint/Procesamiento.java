@@ -1,27 +1,49 @@
-package asint;
+package patron_visitor.asint;
 
-import asint.TinyASint.Suma;
-import asint.TinyASint.Resta;
-import asint.TinyASint.Mul;
-import asint.TinyASint.Div;
-import asint.TinyASint.Id;
-import asint.TinyASint.Num;
-import asint.TinyASint.Dec;
-import asint.TinyASint.Decs_muchas;
-import asint.TinyASint.Decs_una;
-import asint.TinyASint.Prog_sin_decs;
-import asint.TinyASint.Prog_con_decs;
+import patron_visitor.asint.TinyASint.*;
 
 public interface Procesamiento {
     void procesa(Suma exp);
     void procesa(Resta exp);
     void procesa(Mul exp);
     void procesa(Div exp);
+    void procesa(Mod exp);
+    void procesa(Mayor exp);
+    void procesa(Menor exp);
+    void procesa(Igual exp);
+    void procesa(Distinto exp);
+    void procesa(MayorIgual exp);
+    void procesa(MenorIgual exp);
+    void procesa(Not exp);
+    void procesa(And exp);
+    void procesa(Or exp);
+    void procesa(MenosUnario exp);
+    void procesa(Index exp);
+    void procesa(AccesoRegistro exp);
+    void procesa(Indireccion exp);
+    
+    void procesa(Int tipo);
+    void procesa(Real tipo);
+    void procesa(StringTipo tipo);
+    void procesa(Bool tipo);
+
+
+
     void procesa(Id exp);
-    void procesa(Num exp);
+    void procesa(NumEnt exp);
+    void procesa(NumReal exp);
     void procesa(Dec dec);
     void procesa(Decs_muchas decs);
     void procesa(Decs_una decs);
+    void procesa(DecVar decs);
+    void procesa(DecTipo decs);
+    void procesa(DecProc decs);
+    void procesa(Ins_una ins);
+    void procesa (Ins_muchas ins);
+    void procesa (Ins_vacia ins);
+    void procesa (Asignacion ins);
+    
+    void procesa (Pforms pforms);
     void procesa(Prog_sin_decs prog);    
     void procesa(Prog_con_decs prog);    
 }
