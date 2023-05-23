@@ -24,6 +24,7 @@ public class ProcesamientoPorDefecto implements Procesamiento {
     public void procesa(Dec dec) {}
     public void procesa(Decs_muchas decs) {}
     public void procesa(Decs_una decs) {}
+    public void procesa(Decs_vacia decs) {}
     public void procesa(Prog_sin_decs prog) {}    
     public void procesa(Prog_con_decs prog) {}
 	public void procesa(Or exp) {}
@@ -35,6 +36,7 @@ public class ProcesamientoPorDefecto implements Procesamiento {
 	public void procesa(Real tipo) {}
 	public void procesa(StringTipo tipo) {}
 	public void procesa(Bool tipo) {}
+	public void procesa(Array tipo) {}
 	public void procesa(DecVar decs) {}
 	public void procesa(DecTipo decs) {}
 	public void procesa(DecProc decs) {}

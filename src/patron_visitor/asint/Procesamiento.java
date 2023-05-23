@@ -26,7 +26,14 @@ public interface Procesamiento {
     void procesa(Real tipo);
     void procesa(StringTipo tipo);
     void procesa(Bool tipo);
-
+    void procesa(Null tipo);
+    void procesa(Array tipo);
+    void procesa(RecordTipo tipo);
+    void procesa(Pointer pointer);
+    void procesa(Ref ref);
+    
+    void procesa(Campos_muchos campos);
+    void procesa(Campos_uno campo);
 
 
     void procesa(Id exp);
@@ -35,6 +42,7 @@ public interface Procesamiento {
     void procesa(Dec dec);
     void procesa(Decs_muchas decs);
     void procesa(Decs_una decs);
+    void procesa(Decs_vacia decs);
     void procesa(DecVar decs);
     void procesa(DecTipo decs);
     void procesa(DecProc decs);

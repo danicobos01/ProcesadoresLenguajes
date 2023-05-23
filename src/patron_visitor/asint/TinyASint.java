@@ -349,14 +349,18 @@ public class TinyASint {
         public StringLocalizado id() {return id;}
         public void procesa(Procesamiento p) {
            p.procesa(this); 
-        }     
+        }   
+        
+        public String toString() {
+        	return this.id.toString();
+        }
     }
     
     public enum EnumTipo {
-		INT, REAL, STRING, BOOL, ID, POINTER, ARRAY, RECORD, ERROR, OK, NULL
+		INT, REAL, STRING, BOOL, ID, POINTER, ARRAY, RECORD, ERROR, OK, NULL, REF
 	}
     
-    public static abstract class Tipo {
+    public static abstract class Tipo extends NodoAST{
     	EnumTipo tipo;
     	public Tipo(EnumTipo tipo) {
     		this.tipo = tipo;
@@ -427,6 +431,154 @@ public class TinyASint {
 		}
     }
     
+    public static class Null extends Tipo{
+    	public Null(){
+    		super(EnumTipo.NULL);
+    	}
+    	public void procesa(Procesamiento p){
+    		p.procesa(this);
+    	}
+    	public EnumTipo getTipo() {
+    		return EnumTipo.NULL;
+    	}
+    }
+    
+    public static class Array extends Tipo{
+    	int nElems;
+    	EnumTipo tipoElems;
+    	public Array(int n, EnumTipo tipo) {
+    		super(EnumTipo.ARRAY);
+    		this.nElems = n;
+    		this.tipoElems = tipo;
+    	}
+    	public void procesa(Procesamiento p) {
+    		p.procesa(this);
+    	}
+    	public EnumTipo getTipo() {
+    		return EnumTipo.ARRAY;
+    	}
+    	public EnumTipo getTipoElems() {
+    		return this.tipoElems;
+    	}
+    	public int getNElems() {
+    		return this.nElems;
+    	}
+    }
+    
+    public static class RecordTipo extends Tipo{
+    	Campos campos; 
+		public RecordTipo(Campos campos) {
+			super(EnumTipo.RECORD);
+			this.campos = campos
+		}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+
+		public EnumTipo getTipo() {
+			return EnumTipo.RECORD;
+		}
+		public Campos getCampos() {
+			return this.campos;
+		}
+    	
+    }
+    
+    
+    public static class Pointer extends Tipo {
+    	Tipo apuntado;
+    	public Pointer(Tipo tipo) {
+    		super(EnumTipo.POINTER);
+    		this.apuntado = tipo;
+ 
+    	}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+		public EnumTipo getTipo() {
+			return EnumTipo.POINTER;
+		}
+    	public Tipo getApuntado() {
+    		return this.apuntado;
+    	}
+    	public EnumTipo getTipoApuntado() {
+    		return apuntado.getTipo();
+    	}
+    }
+    
+    public static class Ref extends Tipo{
+    	StringLocalizado id;
+    	public Ref(StringLocalizado id) {
+    		super(EnumTipo.REF);
+    		this.id = id;
+    	}
+
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+
+		public EnumTipo getTipo() {
+			return EnumTipo.REF;
+		}
+		
+		public StringLocalizado getId() {
+			return this.id;
+		}
+		
+    }
+    
+    public static class Campo extends NodoAST {
+    	private StringLocalizado id; 
+    	private Tipo tipo;
+    	public Campo(StringLocalizado id, Tipo tipo) {
+    		this.id = id; 
+    		this.tipo = tipo;
+    	}
+    	public StringLocalizado getId() {
+    		return this.id;
+    	}
+    	public Tipo getTipo() {
+    		return this.tipo;
+    	}
+    	public EnumTipo getEnumTipo() {
+    		return this.tipo.getTipo();
+    	}
+    }
+    
+    public static abstract class Campos extends Vector<Campo>{
+    	public Campos() {
+        }
+        public abstract void procesa(Procesamiento p);
+    }
+    
+    public static class Campos_uno extends Campos{
+    	Campo campo;
+		public Campos_uno(Campo campo) {
+			this.campo = campo;
+		}
+		public void procesa(Procesamiento p) {
+			p.procesa(this);			
+		}
+    }
+    
+    public static class Campos_muchos extends Campos{
+    	Campo campo;
+    	Campos campos;
+		public Campos_muchos(Campo campo, Campos campos) {
+			this.campo = campo;
+			this.campos = campos;
+		}
+		public void procesa(Procesamiento p) {
+			p.procesa(this);			
+		}
+    }
+    
+    
+    
+    
+    
     // ??
     /*
     public static class int extends Exp{
@@ -482,6 +634,15 @@ public class TinyASint {
        public void procesa(Procesamiento p) {
            p.procesa(this); 
         }     
+    }
+    
+    public static class Decs_vacia extends Decs{
+    	public Decs_vacia() {
+    		super();
+    	}
+    	public void procesa(Procesamiento p) {
+    		p.procesa(this);
+    	}
     }
     
     public static class DecVar extends Decs {
@@ -696,7 +857,6 @@ public class TinyASint {
 		public Pf_uno(Tipo t, StringLocalizado id) {
 			super(t, id);
 		}
-    	
     }
     
     public static class Pf_vacio extends Pforms{
