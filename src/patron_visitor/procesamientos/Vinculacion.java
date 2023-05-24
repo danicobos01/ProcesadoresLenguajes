@@ -195,6 +195,69 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		}
 	}
 	
+	public void vincula1(Campo campo) {
+		this.vincula1(campo.getTipo());
+	}
+	
+	public void vincula1(Campos_muchos campos) {
+		this.vincula1(campos.getCampos());
+		this.vincula1(campos.getCampo());
+	}
+	
+	public void vincula1(Campos_uno campo) {
+		this.vincula1(campo.getCampo());
+	}
+	
+	public void vincula2(Int int_) {}
+	
+	public void vincula2(Bool bool_) {}
+	
+	public void vincula2(Real real_) {}
+	
+	public void vincula2(StringTipo string_) {}
+	
+	public void vincula2(Null null_) {}
+	
+	public void vincula2(Array arr) {
+		this.vincula2(arr.getTipo());
+	}
+	
+	public void vincula2(RecordTipo rec) {
+		this.vincula2(rec.getCampos());
+	}
+	
+	public void vincula2(Pointer p) {
+		if (p.getTipo() == EnumTipo.REF) {
+			Tipo apuntado = p.getApuntado();
+			Ref r = (Ref)apuntado; // ojo esto
+			if(this.existe(r.getId(), ts)) {
+				p.setVinculo(this.valorDe(r.getId(), ts));
+			}
+			else {
+				error
+			}
+		}
+		else {
+			this.vincula2(p.getTipo());
+		}
+	}
+	
+	public void vincula2(Ref ref) {}
+	
+	public void vincula2(Campo campo) {
+		this.vincula2(campo.getTipo());
+	}
+	
+	public void vincula2(Campos_muchos campos) {
+		this.vincula2(campos.getCampos());
+		this.vincula2(campos.getCampo());
+	}
+	
+	public void vincula2(Campos_uno campo) {
+		this.vincula2(campo.getCampo());
+	}
+	
+	// Parametros
 	
 	
 	

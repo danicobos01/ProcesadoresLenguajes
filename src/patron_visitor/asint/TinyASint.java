@@ -469,7 +469,7 @@ public class TinyASint {
     	Campos campos; 
 		public RecordTipo(Campos campos) {
 			super(EnumTipo.RECORD);
-			this.campos = campos
+			this.campos = campos;
 		}
 
 		public void procesa(Procesamiento p) {
@@ -561,6 +561,9 @@ public class TinyASint {
 		public void procesa(Procesamiento p) {
 			p.procesa(this);			
 		}
+		public Campo getCampo() {
+			return this.campo;
+		}
     }
     
     public static class Campos_muchos extends Campos{
@@ -572,6 +575,12 @@ public class TinyASint {
 		}
 		public void procesa(Procesamiento p) {
 			p.procesa(this);			
+		}
+		public Campos getCampos() {
+			return this.campos;
+		}
+		public Campo getCampo() {
+			return this.campo;
 		}
     }
     
@@ -819,6 +828,39 @@ public class TinyASint {
     	
     }
     
+    public static abstract class Pf extends NodoAST{
+    	private String id;
+    	private Tipo tipo;
+    	public Pf(String id, Tipo tipo) {
+    		this.id = id;
+    		this.tipo = tipo;
+    	}
+    	public String getId() {
+    		return this.id;
+    	}
+    	public Tipo getTipo() {
+    		return this.tipo;
+    	}
+    	public abstract void procesa(Procesamiento p);
+    }
+    
+    public static class Pf_ref extends Pf{
+		public Pf_ref(String id, Tipo tipo) {
+			super(id, tipo);
+		}
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+    }
+    
+    public static class Pf_valor extends Pf{
+		public Pf_valor(String id, Tipo tipo) {
+			super(id, tipo);
+		}
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
+    }    
     
     
     public static abstract class Pforms extends Decs {
@@ -844,27 +886,34 @@ public class TinyASint {
     }
     
     public static class Pf_muchos extends Pforms{
-    	Vector<Pforms> pforms;
-    	Pforms pform;
+    	Pforms pforms;
+    	Pf pform;
 		public Pf_muchos(Tipo t, StringLocalizado id) {
 			super(t, id);
+		}
+		public Pforms getPforms() {
+			return this.pforms;
+		}
+		public Pf getPf() {
+			return this.pform;
 		}
     	
     }
     
     public static class Pf_uno extends Pforms{
-    	Pforms pform;
+    	Pf pform;
 		public Pf_uno(Tipo t, StringLocalizado id) {
 			super(t, id);
+		}
+		public Pf getPf() {
+			return this.pform;
 		}
     }
     
     public static class Pf_vacio extends Pforms{
-    	
 		public Pf_vacio(Tipo t, StringLocalizado id) {
 			super(t, id);
 		}
-    	
     }
     
     public static abstract class Prog  extends NodoAST{
