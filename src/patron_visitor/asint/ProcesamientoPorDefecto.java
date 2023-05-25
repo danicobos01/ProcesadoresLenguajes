@@ -20,7 +20,7 @@ public class ProcesamientoPorDefecto implements Procesamiento {
     public void procesa(Not exp) {}
     public void procesa(Id exp) {}
     public void procesa(NumEnt exp) {}
-    public void procesa (NumReal exp) {}
+    public void procesa(NumReal exp) {}
     public void procesa(Dec dec) {}
     public void procesa(Decs_muchas decs) {}
     public void procesa(Decs_una decs) {}

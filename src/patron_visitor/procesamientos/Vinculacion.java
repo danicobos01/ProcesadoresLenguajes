@@ -12,15 +12,44 @@ import patron_visitor.asint.TinyASint.*;
 
 public class Vinculacion extends ProcesamientoPorDefecto {
 
-	private Stack<Map<String, NodoAST>> ts;
+	public static Stack<Map<String, NodoAST>> ts;
 	
 	public Vinculacion() {
 		ts = new Stack<Map<String, NodoAST>>();
+		this.abreNivel();
+	}
+	
+	public void abreNivel() {
 		ts.push(new HashMap<String, NodoAST>());
 	}
 	
+	public void cierraNivel() {
+		ts.remove(ts.size() - 1);
+	}
+	
+	public boolean existeId(StringLocalizado id) {
+        for (int i = ts.size() - 1; i >= 0; i--) {
+            if (ts.get(i).containsKey(id)) {
+            	return true;
+            }
+        }
+        return false;
+    }
+	
 	public enum tipoError {
 		idDeclarado
+	}
+	
+	
+	public void add(StringLocalizado id, NodoAST nodo) {
+		if (ts.get(ts.size() - 1).containsKey(id.toString())) {
+			GestorErrores.addError("Identificador duplicado: " + id); // VER COMO HACER LO DE LOS ERRORES
+		}
+        else {
+        	ts.peek().put(id.toString(), nodo);
+        	// ts.get(ts.size() - 1).put(id.toString(), nodo);
+        }
+            
 	}
 	
 	public Dec getDec(StringLocalizado id) {
@@ -111,12 +140,12 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	public void vincula1(DecProc dec) {
 		this.recolecta
-		this.abreNivel
+		this.abreNivel();
 		this.vincula1(dec.getPforms());
 		this.vincula1(dec.getDecs());
 		this.vincula2(dec.getDecs());
 		dec.getIns().procesa(this);
-		this.cierraNivel
+		this.cierraNivel();
 	}
 	
 	public void vincula2(Decs_muchas decs) {
@@ -151,25 +180,15 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	// Tipos
 	
-	public void vincula1(Int int_) {
-		
-	}
+	public void vincula1(Int int_) {}
 	
-	public void vincula1(Real real) {
-		
-	}
+	public void vincula1(Real real) {}
 	
-	public void vincula1(Bool bool) {
-		
-	}
+	public void vincula1(Bool bool) {}
 	
-	public void vincula1(StringTipo st) {
-		
-	}
+	public void vincula1(StringTipo st) {}
 	
-	public void vincula1(Null null_) {
-		
-	}
+	public void vincula1(Null null_) {}
 	
 	public void vincula1(Array arr) {
 		this.vincula1(arr.getTipoElems());
@@ -186,7 +205,7 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	}
 	
 	public void vincula1(Ref ref) {
-		if(this.existe(ref.getId(), ts)) {
+		if(existeId(ref.getId())) {
 			// $.vinculo = valorDe(ts,id)
 			ref.setVinculo(ts.valorDe(ts, ref.getId()));
 		}
@@ -230,7 +249,7 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		if (p.getTipo() == EnumTipo.REF) {
 			Tipo apuntado = p.getApuntado();
 			Ref r = (Ref)apuntado; // ojo esto
-			if(this.existe(r.getId(), ts)) {
+			if(existeId(r.getId())) {
 				p.setVinculo(this.valorDe(r.getId(), ts));
 			}
 			else {
@@ -259,8 +278,155 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	// Parametros
 	
+	public void vincula1(Pf_valor pf) {
+		this.vincula1(pf.getTipo());
+		this.recolecta...
+	}
+	
+	public void vincula1(Pf_ref pf) {
+		this.vincula1(pf.getTipo());
+		this.recolecta...
+	}
+	
+	public void vincula1(Pf_muchos pf) {
+		this.vincula1(pf.getPforms());
+		this.vincula1(pf.getPf());
+	}
+	
+	public void vincula1(Pf_vacio pf) {}
+	
+	public void vincula1(Pf_uno pf) {
+		this.vincula1(pf.getPf());
+	}
+	
+	public void vincula2(Pf_valor pf) {
+		this.vincula2(pf.getTipo());
+	}
+	
+	public void vincula2(Pf_ref pf) {
+		this.vincula2(pf.getTipo());
+	}
+	
+	public void procesa(Pr pr) {
+		pr.getExp().procesa(this);
+	}
+	public void procesa(Pr_muchos pr) {
+		pr.getPreales().procesa(this);
+		pr.getPr().procesa(this);
+	}
+	public void procesa(Pr_vacio pr) {}
+	public void procesa(Pr_uno pr) {
+		pr.getPr().procesa(this);
+	}
 	
 	
+	// Expresiones
+	
+	public void procesa(Id id) {
+		if(!existeId(id.id())) {
+			id.setVinculo(getDec(id.id())); // No sé si es getDec o no
+		}
+		else {
+			// LANZAREMOS ERROR
+		}
+	}
+	
+	public void procesa (NumEnt n) {}
+	public void procesa (NumReal n) {}
+	public void procesa (TrueExp true_) {}
+	public void procesa (FalseExp false_) {}
+	public void procesa (StringExp str) {}
+	public void procesa (NullExp n) {}
+	
+	public void procesa (Not exp) {
+		exp.getExp().procesa(this);
+	}
+	
+	public void procesa (MenosUnario exp) {
+		exp.getExp().procesa(this);
+	}
+	
+	public void procesa(Igual exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Distinto exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Mayor exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(MayorIgual exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Menor exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(MenorIgual exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(And exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Or exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Suma exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Resta exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Mul exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Div exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Mod exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Index exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+	}
+	
+	public void procesa(Indireccion exp) {
+		exp.getExp().procesa(this);
+	}
+	
+	public void procesa(AccesoRegistro exp) {
+		exp.getExp().procesa(this);
+	}
+	
+	
+	
+	// Instrucciones 
 	
 	public void procesa(Ins_una ins) {
 		ins.in().procesa(this);
@@ -271,55 +437,66 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		ins.in().procesa(this);
 	}
 	
+	public void procesa(Ins_vacia ins) {}
+		
 	public void procesa(Asignacion asig) {
 		asig.getFirst().procesa(this);
 		asig.getSecond().procesa(this);
 	}
 	
-	public void procesa(Id id) {
-		if(ts.contains(id.toString())) {
-			id.setVinculo(getDec(id.id())); // No sé si es getDec o no
+	public void procesa(If_then ins) {
+		ins.getExp().procesa(this);
+		ins.getIns().procesa(this);
+	}
+	
+	public void procesa(If_then_else ins) {
+		ins.getExp().procesa(this);
+		ins.getIns1().procesa(this);
+		ins.getIns2().procesa(this);
+	}
+	
+	public void procesa(While ins) {
+		ins.getExp().procesa(this);
+		ins.getIns().procesa(this);
+	}
+	
+	public void procesa(Read ins) {
+		ins.getExp().procesa(this);
+	}
+	
+	public void procesa(Write ins) {
+		ins.getExp().procesa(this);
+	}
+	
+	public void procesa(New ins) {
+		ins.getExp().procesa(this);
+	}
+	
+	public void procesa(NewLine ins) {}
+	
+	public void procesa(Delete ins) {
+		ins.getExp().procesa(this);
+	}
+	
+	public void procesa(Seq seq) {
+		this.abreNivel();
+		this.vincula1(seq.getDecs());
+		this.vincula2(seq.getDecs());
+		seq.getIns().procesa(this);
+		this.cierraNivel();
+	}
+	
+	public void procesa(Invoc_proc inv) {
+		if(this.existeId(inv.getId())) {
+			inv.setVinculo(valorDe(ts, id));
 		}
 		else {
-			// LANZAREMOS ERROR
+			error
 		}
-	}
-	
-	public void procesa(Suma suma) {
-		suma.arg0().procesa(this);
-		suma.arg1().procesa(this);
-	}
-	
-	public void procesa(Resta resta) {
-		resta.arg0().procesa(this);
-		resta.arg1().procesa(this);
-	}
-	
-	public void procesa(NumEnt num) {
-		num.procesa(this); // No hay que hacer nada aquí
+		inv.getPreales().procesa(this);
 	}
 	
 	
-	// PRIMERA PASADA
-	
-	public void vincula1(Decs decs) {
-		
-	}
-	
-	public void vincula1 (Dec dec) {
-		
-	}
-	
-	
-	// SEGUNDA PASADA
-	
-	public void vincula2(Decs decs) {
-		
-	}
-	
-	public void vincula2(Dec dec) {
-		
-	}
 	
 
 }

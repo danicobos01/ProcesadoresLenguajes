@@ -35,10 +35,13 @@ public interface Procesamiento {
     void procesa(Campos_muchos campos);
     void procesa(Campos_uno campo);
 
-
     void procesa(Id exp);
     void procesa(NumEnt exp);
     void procesa(NumReal exp);
+    void procesa (TrueExp exp);
+    void procesa (FalseExp exp);
+    void procesa(StringExp exp);
+    void procesa(NullExp exp);
     void procesa(Dec dec);
     void procesa(Decs_muchas decs);
     void procesa(Decs_una decs);
@@ -50,8 +53,20 @@ public interface Procesamiento {
     void procesa (Ins_muchas ins);
     void procesa (Ins_vacia ins);
     void procesa (Asignacion ins);
-    
-    void procesa (Pforms pforms);
+    void procesa (If_then ins);
+    void procesa (If_then_else ins);
+    void procesa (While ins);
+    void procesa (Read ins);
+    void procesa (Write ins);
+    void procesa (NewLine ins);
+    void procesa (Seq ins);
+    void procesa (Invoc_proc ins);
+    void procesa (New ins);
+    void procesa (Delete ins);
+    void procesa (Pforms pf);
+    void procesa(Pf_ref pf);
+    void procesa(Pf_valor pf);
+    void procesa(PReales pf);
     void procesa(Prog_sin_decs prog);    
     void procesa(Prog_con_decs prog);    
 }
