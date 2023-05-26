@@ -44,5 +44,28 @@ public class ProcesamientoPorDefecto implements Procesamiento {
 	public void procesa(Ins_muchas ins) {}
 	public void procesa(Ins_vacia ins) {}
 	public void procesa(Asignacion ins) {}
-	public void procesa(Pforms pforms) {}   
+	public void procesa(Pforms pforms) {}
+	public void procesa(Null tipo) {}
+	public void procesa(RecordTipo tipo) {}
+	public void procesa(Pointer pointer) {}
+	public void procesa(Ref ref) {}
+	public void procesa(Campos_muchos campos) {}
+	public void procesa(Campos_uno campo) {}
+	public void procesa(TrueExp exp) {}
+	public void procesa(FalseExp exp) {}
+	public void procesa(StringExp exp) {}
+	public void procesa(NullExp exp) {}
+	public void procesa(If_then ins) {}
+	public void procesa(If_then_else ins) {}
+	public void procesa(While ins) {}
+	public void procesa(Read ins) {}
+	public void procesa(Write ins) {}
+	public void procesa(NewLine ins) {}
+	public void procesa(Seq ins) {}
+	public void procesa(Invoc_proc ins) {}
+	public void procesa(New ins) {}
+	public void procesa(Delete ins) {}
+	public void procesa(Pf_ref pf) {}
+	public void procesa(Pf_valor pf) {}
+	public void procesa(PReales pf) {}   
 }

@@ -336,7 +336,6 @@ public class TinyASint {
 			this.id = id;
 		}
 
-
 		public StringLocalizado getId() {
 			return this.id;
 		}
@@ -432,9 +431,6 @@ public class TinyASint {
     }
     
     
-    
-    
-    
     public enum EnumTipo {
 		INT, REAL, STRING, BOOL, ID, POINTER, ARRAY, RECORD, ERROR, OK, NULL, REF
 	}
@@ -447,7 +443,8 @@ public class TinyASint {
     	
     	public abstract void procesa(Procesamiento p);
     	
-    	public abstract EnumTipo getTipo();
+    	public abstract EnumTipo getEnumTipo();
+    	public abstract Tipo getTipo();
     }
     
     public static class Int extends Tipo{
@@ -460,8 +457,12 @@ public class TinyASint {
 			p.procesa(this);
 		}
 
-		public EnumTipo getTipo() {
+		public EnumTipo getEnumTipo() {
 			return EnumTipo.INT;
+		}
+
+		public Int getTipo() {
+			return this;
 		}
     }
     
@@ -475,8 +476,11 @@ public class TinyASint {
 			p.procesa(this);
 		}
 
-		public EnumTipo getTipo() {
+		public EnumTipo getEnumTipo() {
 			return EnumTipo.REAL;
+		}
+		public Real getTipo() {
+			return this;
 		}
     }
     
@@ -490,8 +494,11 @@ public class TinyASint {
 			p.procesa(this);
 		}
 
-		public EnumTipo getTipo() {
+		public EnumTipo getEnumTipo() {
 			return EnumTipo.BOOL;
+		}
+		public Bool getTipo() {
+			return this;
 		}
     }
     
@@ -505,8 +512,11 @@ public class TinyASint {
 			p.procesa(this);
 		}
 
-		public EnumTipo getTipo() {
+		public EnumTipo getEnumTipo() {
 			return EnumTipo.STRING;
+		}
+		public StringTipo getTipo() {
+			return this;
 		}
     }
     
@@ -517,9 +527,12 @@ public class TinyASint {
     	public void procesa(Procesamiento p){
     		p.procesa(this);
     	}
-    	public EnumTipo getTipo() {
+    	public EnumTipo getEnumTipo() {
     		return EnumTipo.NULL;
     	}
+    	public Null getTipo() {
+			return this;
+		}
     }
     
     public static class Array extends Tipo{
@@ -533,9 +546,12 @@ public class TinyASint {
     	public void procesa(Procesamiento p) {
     		p.procesa(this);
     	}
-    	public EnumTipo getTipo() {
+    	public EnumTipo getEnumTipo() {
     		return EnumTipo.ARRAY;
     	}
+    	public Array getTipo() {
+			return this;
+		}
     	public EnumTipo getTipoElems() {
     		return this.tipoElems;
     	}
@@ -555,8 +571,11 @@ public class TinyASint {
 			p.procesa(this);
 		}
 
-		public EnumTipo getTipo() {
+		public EnumTipo getEnumTipo() {
 			return EnumTipo.RECORD;
+		}
+		public RecordTipo getTipo() {
+			return this;
 		}
 		public Campos getCampos() {
 			return this.campos;
@@ -576,14 +595,17 @@ public class TinyASint {
 		public void procesa(Procesamiento p) {
 			p.procesa(this);
 		}
-		public EnumTipo getTipo() {
+		public EnumTipo getEnumTipo() {
 			return EnumTipo.POINTER;
+		}
+		public Pointer getTipo() {
+			return this;
 		}
     	public Tipo getApuntado() {
     		return this.apuntado;
     	}
     	public EnumTipo getTipoApuntado() {
-    		return apuntado.getTipo();
+    		return apuntado.getEnumTipo();
     	}
     }
     
@@ -598,10 +620,12 @@ public class TinyASint {
 			p.procesa(this);
 		}
 
-		public EnumTipo getTipo() {
+		public EnumTipo getEnumTipo() {
 			return EnumTipo.REF;
 		}
-		
+		public Ref getTipo() {
+			return this;
+		}
 		public StringLocalizado getId() {
 			return this.id;
 		}
@@ -622,7 +646,7 @@ public class TinyASint {
     		return this.tipo;
     	}
     	public EnumTipo getEnumTipo() {
-    		return this.tipo.getTipo();
+    		return this.tipo.getEnumTipo();
     	}
     }
     
@@ -665,31 +689,16 @@ public class TinyASint {
     
     
     
-    
-    
-    // ??
-    /*
-    public static class int extends Exp{
-    	
-    }
-    */
-    
-    
-    
     public static class Dec extends NodoAST {
         private StringLocalizado id;
-        private StringLocalizado val;
-        public Dec(StringLocalizado id, StringLocalizado val) {
+        public Dec(StringLocalizado id) {
             this.id = id;
-            this.val = val;
         }
         public StringLocalizado id() {return id;}
-        public StringLocalizado val() {return val;}
         public void procesa(Procesamiento p) {
            p.procesa(this); 
         }     
     }
-    
     
     public static abstract class Decs extends NodoAST {
        public Decs() {
@@ -733,89 +742,64 @@ public class TinyASint {
     	}
     }
     
-    public static class DecVar extends Decs {
-    	StringLocalizado id; 
+    public static class DecVar extends Dec { 
     	Tipo tipo;
     	public DecVar(StringLocalizado id, Tipo tipo) {
-    		this.id = id;
+    		super(id);
     		this.tipo = tipo;
-    	}
-    	
-    	public StringLocalizado getId() {
-    		return this.id;
     	}
     	
     	public Tipo getTipo() {
     		return this.tipo;
     	}
-		@Override
 		public void procesa(Procesamiento p) {
 			p.procesa(this);
 		}
     	
     }
     
-    public static class DecTipo extends Decs {
-    	StringLocalizado id; 
+    public static class DecTipo extends Dec { 
     	Tipo tipo;
     	public DecTipo(StringLocalizado id, Tipo tipo) {
-    		this.id = id;
+    		super(id);
     		this.tipo = tipo;
     	}
-    	
-    	public StringLocalizado getId() {
-    		return this.id;
-    	}
-    	
     	public Tipo getTipo() {
     		return this.tipo;
     	}
-		@Override
 		public void procesa(Procesamiento p) {
 			p.procesa(this);
 		}
     	
     }
     
-    public static class DecProc extends Decs {
-    	StringLocalizado id; 
+    public static class DecProc extends Dec {
     	Pforms pforms;
-    	Vector<Instrucciones> ins;
-    	Vector<Decs> decs;
-    	public DecProc(StringLocalizado id, Pforms pforms, Vector<Instrucciones> ins, Vector<Decs> decs) {
-    		this.id = id;
+    	Instrucciones ins;
+    	Decs decs;
+    	public DecProc(StringLocalizado id, Pforms pforms, Instrucciones ins, Decs decs) {
+    		super(id);
     		this.pforms = pforms;
     		this.ins = ins;
     		this.decs = decs;
-    	}
-    	
-    	public StringLocalizado getId() {
-    		return this.id;
-    	}
-    	
+    	}	
     	public Pforms getPforms() {
     		return this.pforms;
     	}
     	
-    	public Vector<Instrucciones> getIns() {
+    	public Instrucciones getIns() {
     		return this.ins;
     	}
     	
-    	public Vector<Decs> getDecs() {
+    	public Decs getDecs() {
     		return this.decs;
     	}
     	
-		@Override
 		public void procesa(Procesamiento p) {
 			p.procesa(this);
 		}
     	
     }
-    
-    
-    
-    
-    
     
     
     public static abstract class Instruccion extends NodoAST {
@@ -1126,12 +1110,10 @@ public class TinyASint {
     }    
     
     
-    public static abstract class Pforms extends Decs {
+    public static abstract class Pforms extends NodoAST {
 		public Pforms() {
 		}
-		public void procesa(Procesamiento p) {
-			p.procesa(this);
-		}
+		public abstract void procesa(Procesamiento p);
     }
     
     public static class Pf_muchos extends Pforms{
@@ -1147,6 +1129,9 @@ public class TinyASint {
 		public Pf getPf() {
 			return this.pform;
 		}
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
     	
     }
     
@@ -1158,11 +1143,17 @@ public class TinyASint {
 		public Pf getPf() {
 			return this.pform;
 		}
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
+		}
     }
     
     public static class Pf_vacio extends Pforms{
 		public Pf_vacio() {
 	
+		}
+		public void procesa(Procesamiento p) {
+			p.procesa(this);
 		}
     }
     
@@ -1306,7 +1297,7 @@ public class TinyASint {
         return new Id(num);
     }
     public Dec dec(StringLocalizado id, StringLocalizado val) {
-        return new Dec(id,val);
+        return new Dec(id);
     }
     public Decs decs_una(Dec dec) {
         return new Decs_una(dec);
@@ -1315,15 +1306,15 @@ public class TinyASint {
         return new Decs_muchas(decs,dec);
     }
     
-    public Decs decVar(StringLocalizado id, Tipo tipo) {
+    public Dec decVar(StringLocalizado id, Tipo tipo) {
     	return new DecVar(id, tipo);
     }
     
-    public Decs decTipo(StringLocalizado id, Tipo tipo) {
+    public Dec decTipo(StringLocalizado id, Tipo tipo) {
     	return new DecTipo(id, tipo);
     }
     
-    public Decs decProc(StringLocalizado id, Pforms pforms, Vector<Instrucciones> ins, Vector<Decs> decs) {
+    public Dec decProc(StringLocalizado id, Pforms pforms, Instrucciones ins, Decs decs) {
     	return new DecProc(id, pforms, ins, decs);
     }
     

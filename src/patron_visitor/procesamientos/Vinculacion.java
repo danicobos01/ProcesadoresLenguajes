@@ -1,5 +1,7 @@
 package patron_visitor.procesamientos;
 
+import java.util.AbstractMap.SimpleEntry;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
@@ -13,6 +15,8 @@ import patron_visitor.asint.TinyASint.*;
 public class Vinculacion extends ProcesamientoPorDefecto {
 
 	public static Stack<Map<String, NodoAST>> ts;
+	public static final ArrayList<String> errores = new ArrayList<String>();
+
 	
 	public Vinculacion() {
 		ts = new Stack<Map<String, NodoAST>>();
@@ -37,19 +41,21 @@ public class Vinculacion extends ProcesamientoPorDefecto {
     }
 	
 	public enum tipoError {
-		idDeclarado
+		idDuplicado, idNoDeclarado
 	}
 	
 	
 	public void add(StringLocalizado id, NodoAST nodo) {
 		if (ts.get(ts.size() - 1).containsKey(id.toString())) {
-			GestorErrores.addError("Identificador duplicado: " + id); // VER COMO HACER LO DE LOS ERRORES
+			errores.add(tipoError.idDuplicado + ": " + id.toString()); 
 		}
         else {
         	ts.peek().put(id.toString(), nodo);
-        	// ts.get(ts.size() - 1).put(id.toString(), nodo);
-        }
-            
+        }     
+	}
+	
+	public boolean hayErrores() {
+		return errores.size() > 0;
 	}
 	
 	public Dec getDec(StringLocalizado id) {
@@ -95,12 +101,21 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		}
 	}
 	
+	/*
 	public void printError(StringLocalizado s, tipoError err) {
 		if(err == tipoError.idDeclarado) {
 			System.out.println("Error: " + s.toString() + " - id ya declarado");
 		}
 	}
+	*/
 	
+	public NodoAST valorDe(String id) {
+		for (int i = ts.size() - 1; i >= 0; i--) {
+	       if (ts.get(i).containsKey(id))
+	           return ts.get(i).get(id);
+	    }
+	    return null;
+	}
 	
 	
 	
@@ -130,16 +145,16 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	public void vincula1(DecTipo dec) {
 		this.vincula1(dec.getTipo());
-		this.recolecta 
+		this.add(dec.id(), dec);
 	}
 	
 	public void vincula1(DecVar dec) {
 		this.vincula1(dec.getTipo());
-		this.recolecta
+		this.add(dec.id(), dec);
 	}
 	
 	public void vincula1(DecProc dec) {
-		this.recolecta
+		this.add(dec.id(), dec);
 		this.abreNivel();
 		this.vincula1(dec.getPforms());
 		this.vincula1(dec.getDecs());
@@ -169,16 +184,10 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	public void vincula2(DecProc dec) {
 		this.vincula2(dec.getPforms());
-		this.recolecta
-		if(this.idDuplicadoAct(dec.getId())) {
-			error
-		}
-		else {
-			this.addTabla
-		}
 	}
 	
 	// Tipos
+	
 	
 	public void vincula1(Int int_) {}
 	
@@ -206,13 +215,13 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	public void vincula1(Ref ref) {
 		if(existeId(ref.getId())) {
-			// $.vinculo = valorDe(ts,id)
-			ref.setVinculo(ts.valorDe(ts, ref.getId()));
+			ref.setVinculo(valorDe(ref.getId().toString()));
 		}
 		else {
-			error // id no declarado
+			errores.add(tipoError.idNoDeclarado + ": " + ref.getId().toString()); // id no declarado
 		}
 	}
+	
 	
 	public void vincula1(Campo campo) {
 		this.vincula1(campo.getTipo());
@@ -246,14 +255,14 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	}
 	
 	public void vincula2(Pointer p) {
-		if (p.getTipo() == EnumTipo.REF) {
+		if (p.getEnumTipo() == EnumTipo.REF) {
 			Tipo apuntado = p.getApuntado();
-			Ref r = (Ref)apuntado; // ojo esto
+			Ref r = (Ref)apuntado; 
 			if(existeId(r.getId())) {
-				p.setVinculo(this.valorDe(r.getId(), ts));
+				p.setVinculo(valorDe(r.getId().toString()));
 			}
 			else {
-				error
+				errores.add(tipoError.idNoDeclarado + ": " + r.getId().toString());
 			}
 		}
 		else {
@@ -433,7 +442,7 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	}
 	
 	public void procesa(Ins_muchas ins) {
-		ins.ins().procesa(this); // Hay que ver lo del vector...
+		ins.ins().procesa(this); 
 		ins.in().procesa(this);
 	}
 	
@@ -488,12 +497,25 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	public void procesa(Invoc_proc inv) {
 		if(this.existeId(inv.getId())) {
-			inv.setVinculo(valorDe(ts, id));
+			inv.setVinculo(valorDe(inv.getId().toString()));
 		}
 		else {
-			error
+			errores.add(tipoError.idNoDeclarado + ": " + inv.getId().toString());
 		}
 		inv.getPreales().procesa(this);
+	}
+	
+	
+	private class Procesa2 extends ProcesamientoPorDefecto{
+		
+		public void procesa(Decs_muchas decs) {
+			decs.decs().procesa(this);
+			decs.dec().procesa(this);
+		}
+		
+		public void procesa(Decs_una dec) {
+			dec.dec().procesa(this);
+		}
 	}
 	
 	

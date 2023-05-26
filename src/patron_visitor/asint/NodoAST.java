@@ -6,17 +6,17 @@ public class NodoAST {
 
 	public StringLocalizado s;
 	public EnumTipo tipo;
-	public Dec vinculo;
+	public NodoAST vinculo;
 
 	public NodoAST() {
 		
 	}
 	
-	public Dec getVinculo() {
+	public NodoAST getVinculo() {
 		return this.vinculo;
 	}
 	
-	public void setVinculo(Dec vinculo) {
+	public void setVinculo(NodoAST vinculo) {
 		this.vinculo = vinculo;
 	}
 	
