@@ -12,7 +12,7 @@ import asint.TinyASint.Prog;
 import asint.TinyASint.Exp;
 import asint.TinyASint.Decs;
 import asint.TinyASint.Dec;
-import asint.TinyASint.StringLocalizado;
+import asint.TinyASint.SL;
 import java_cup.runtime.ComplexSymbolFactory.Location;
 
 /** CUP v0.11b beta 20140220 generated parser.
@@ -267,7 +267,7 @@ class CUP$ConstructorAST$actions {
           case 8: // E2 ::= NUM 
             {
               Exp RESULT =null;
-		StringLocalizado num = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ConstructorAST$stack.peek()).value;
+		SL num = (SL)((java_cup.runtime.Symbol) CUP$ConstructorAST$stack.peek()).value;
 		 RESULT = sem.num(num); 
               CUP$ConstructorAST$result = parser.getSymbolFactory().newSymbol("E2",6, RESULT);
             }
@@ -277,7 +277,7 @@ class CUP$ConstructorAST$actions {
           case 9: // E2 ::= ID 
             {
               Exp RESULT =null;
-		StringLocalizado id = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ConstructorAST$stack.peek()).value;
+		SL id = (SL)((java_cup.runtime.Symbol) CUP$ConstructorAST$stack.peek()).value;
 		 RESULT = sem.id(id); 
               CUP$ConstructorAST$result = parser.getSymbolFactory().newSymbol("E2",6, RESULT);
             }
@@ -354,8 +354,8 @@ class CUP$ConstructorAST$actions {
           case 17: // Dec ::= ID IGUAL NUM 
             {
               Dec RESULT =null;
-		StringLocalizado id = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ConstructorAST$stack.elementAt(CUP$ConstructorAST$top-2)).value;
-		StringLocalizado num = (StringLocalizado)((java_cup.runtime.Symbol) CUP$ConstructorAST$stack.peek()).value;
+		SL id = (SL)((java_cup.runtime.Symbol) CUP$ConstructorAST$stack.elementAt(CUP$ConstructorAST$top-2)).value;
+		SL num = (SL)((java_cup.runtime.Symbol) CUP$ConstructorAST$stack.peek()).value;
 		 RESULT = sem.dec(id,num); 
               CUP$ConstructorAST$result = parser.getSymbolFactory().newSymbol("Dec",3, RESULT);
             }

@@ -1,17 +1,17 @@
 package c_ast_ascendente;
 
-import asint.TinyASint.StringLocalizado;
+import asint.TinyASint.SL;
 import java_cup.runtime.Symbol;
 
 public class UnidadLexica extends Symbol {
    public UnidadLexica(int fila, int col, int clase, String lexema) {
      super(clase,null);
-     value = new StringLocalizado(lexema,fila,col);
+     value = new SL(lexema,fila,col);
    }
    public int clase () {return sym;}
-   public StringLocalizado lexema() {return (StringLocalizado)value;}
+   public SL lexema() {return (SL)value;}
    public String toString() {
-       StringLocalizado lexema = (StringLocalizado)value;
+       SL lexema = (SL)value;
        return "[clase="+clase2string(sym)+",lexema="+lexema+",fila="+lexema.fila()+",col="+lexema.col()+"]";
    }
    private String clase2string(int clase) {

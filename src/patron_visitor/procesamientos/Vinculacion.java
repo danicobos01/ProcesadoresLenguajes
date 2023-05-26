@@ -1,6 +1,6 @@
 package patron_visitor.procesamientos;
 
-import java.util.AbstractMap.SimpleEntry;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,7 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		ts.remove(ts.size() - 1);
 	}
 	
-	public boolean existeId(StringLocalizado id) {
+	public boolean existeId(String id) {
         for (int i = ts.size() - 1; i >= 0; i--) {
             if (ts.get(i).containsKey(id)) {
             	return true;
@@ -44,75 +44,27 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		idDuplicado, idNoDeclarado
 	}
 	
-	
-	public void add(StringLocalizado id, NodoAST nodo) {
+	public void add(SL id, NodoAST nodo) {
 		if (ts.get(ts.size() - 1).containsKey(id.toString())) {
+        	System.out.println("ERROR: " + id.toString() + " - nodo");
 			errores.add(tipoError.idDuplicado + ": " + id.toString()); 
 		}
         else {
         	ts.peek().put(id.toString(), nodo);
+        	System.out.println("id.toString() - nodo");
         }     
 	}
 	
 	public boolean hayErrores() {
 		return errores.size() > 0;
 	}
-	
-	public Dec getDec(StringLocalizado id) {
-		for (Map<String, NodoAST> t : ts) {
-			if (t.containsKey(id.toString())) {
-				return t.get(id.toString()).getVinculo();
-			}
-		}
-		return null;
-	}
-
-	public boolean idDuplicadoTodos(StringLocalizado id) {
-		for (Map<String, NodoAST> t : ts) {
-			if (t.containsKey(id.toString()))
-				return true;
-		}
-		return false;
-	}
-
-	public boolean idDuplicadoAct(StringLocalizado id) {
-		if (ts.peek().containsKey(id.toString()))
-			return true;
-		return false;
-	}
-	
-	public void aniade(StringLocalizado id, Decs d) {
-		ts.peek().put(id.toString(), new NodoAST()); // Que pasamos aquí ??
-	}
-	
-	public void recolectaTodos(StringLocalizado id, Decs d) {
-		if (idDuplicadoTodos(id)) {
-			printError(id, tipoError.idDeclarado);
-		} else {
-			aniade(id, d);
-		}
-	}
-
-	public void recolectaAct(StringLocalizado id, Decs d) {
-		if (idDuplicadoAct(id)) {
-			printError(id, tipoError.idDeclarado);
-		} else {
-			aniade(id, d);
-		}
-	}
-	
-	/*
-	public void printError(StringLocalizado s, tipoError err) {
-		if(err == tipoError.idDeclarado) {
-			System.out.println("Error: " + s.toString() + " - id ya declarado");
-		}
-	}
-	*/
-	
+		
 	public NodoAST valorDe(String id) {
 		for (int i = ts.size() - 1; i >= 0; i--) {
 	       if (ts.get(i).containsKey(id))
+	    	   System.out.println(id);
 	           return ts.get(i).get(id);
+	       
 	    }
 	    return null;
 	}
@@ -121,48 +73,50 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	// VINCULACION DE LAS DISTINTAS CLASES
 	
+	public void procesa(Prog_con_decs prog) {
+		prog.getDeclaraciones().procesa(this);
+		prog.getDeclaraciones().procesa(new Procesa2());
+		prog.getInstrucciones().procesa(this);
+	}
+	
+	
 	public void procesa(Prog_sin_decs prog) {
 		prog.getInstrucciones().procesa(this);
 	}
 	
-	public void procesa(Prog_con_decs prog) {
-		this.vincula1(prog.getDeclaraciones());
-		this.vincula2(prog.getDeclaraciones());
-		prog.getInstrucciones().procesa(this);
+	
+	public void procesa(Decs_muchas decs) {
+		decs.decs().procesa(this);
+		decs.dec().procesa(this);
 	}
 	
-	
-	public void vincula1(Decs_muchas decs) {
-		this.vincula1(decs.decs());
-		this.vincula1(decs.dec());
-	}
-	
-	public void vincula1(Decs_una dec) {
-		this.vincula1(dec.dec());
+	public void procesa(Decs_una dec) {
+		dec.dec().procesa(this);
 	}
 	
 	public void vincula1(Decs_vacia decs) {}
 	
-	public void vincula1(DecTipo dec) {
-		this.vincula1(dec.getTipo());
+	public void procesa(DecTipo dec) {
+		dec.getTipo().procesa(this);
 		this.add(dec.id(), dec);
 	}
 	
-	public void vincula1(DecVar dec) {
-		this.vincula1(dec.getTipo());
+	public void procesa(DecVar dec) {
+		dec.getTipo().procesa(this);
 		this.add(dec.id(), dec);
 	}
 	
-	public void vincula1(DecProc dec) {
+	public void procesa(DecProc dec) {
 		this.add(dec.id(), dec);
 		this.abreNivel();
-		this.vincula1(dec.getPforms());
-		this.vincula1(dec.getDecs());
-		this.vincula2(dec.getDecs());
+		dec.getPforms().procesa(this);
+		dec.getDecs().procesa(this);
+		dec.getDecs().procesa(new Procesa2()); // ojo
 		dec.getIns().procesa(this);
 		this.cierraNivel();
 	}
 	
+	/*
 	public void vincula2(Decs_muchas decs) {
 		this.vincula2(decs.decs());
 		this.vincula2(decs.dec());
@@ -185,57 +139,62 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	public void vincula2(DecProc dec) {
 		this.vincula2(dec.getPforms());
 	}
+	*/
+	
 	
 	// Tipos
 	
 	
-	public void vincula1(Int int_) {}
+	public void procesa(Int int_) {}
 	
-	public void vincula1(Real real) {}
+	public void procesa(Real real) {}
 	
-	public void vincula1(Bool bool) {}
+	public void procesa(Bool bool) {}
 	
-	public void vincula1(StringTipo st) {}
+	public void procesa(StringTipo st) {}
 	
-	public void vincula1(Null null_) {}
+	public void procesa(Null null_) {}
 	
-	public void vincula1(Array arr) {
-		this.vincula1(arr.getTipoElems());
+	public void procesa(Array arr) {
+		arr.getTipoElems().procesa(this);
 	}
 	
-	public void vincula1(RecordTipo rec) {
-		this.vincula1(rec.getCampos());
+	public void procesa(RecordTipo rec) {
+		rec.getCampos().procesa(this);
 	}
 	
-	public void vincula1(Pointer pointer) {
+	public void procesa(Pointer pointer) {
 		if(pointer.getTipoApuntado() != EnumTipo.REF ) {
-			this.vincula1(pointer.getApuntado());
+			pointer.getApuntado().procesa(this);
 		}
 	}
 	
-	public void vincula1(Ref ref) {
-		if(existeId(ref.getId())) {
+	public void procesa(Ref ref) {
+		if(existeId(ref.getId().toString())) {
+			
 			ref.setVinculo(valorDe(ref.getId().toString()));
 		}
 		else {
-			errores.add(tipoError.idNoDeclarado + ": " + ref.getId().toString()); // id no declarado
+        	System.out.println("ERROR: " + ref.getId().toString() + " - ref");
+			errores.add(tipoError.idNoDeclarado + ": " + ref.getId().toString());
 		}
 	}
 	
 	
-	public void vincula1(Campo campo) {
-		this.vincula1(campo.getTipo());
+	public void procesa(Campo campo) {
+		campo.getTipo().procesa(this);
 	}
 	
-	public void vincula1(Campos_muchos campos) {
-		this.vincula1(campos.getCampos());
-		this.vincula1(campos.getCampo());
+	public void procesa(Campos_muchos campos) {
+		campos.getCampos().procesa(this);
+		campos.getCampo().procesa(this);
 	}
 	
-	public void vincula1(Campos_uno campo) {
-		this.vincula1(campo.getCampo());
+	public void procesa(Campos_uno campo) {
+		campo.getCampo().procesa(this);
 	}
 	
+	/*
 	public void vincula2(Int int_) {}
 	
 	public void vincula2(Bool bool_) {}
@@ -285,29 +244,32 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		this.vincula2(campo.getCampo());
 	}
 	
+	*/
+	
 	// Parametros
 	
-	public void vincula1(Pf_valor pf) {
-		this.vincula1(pf.getTipo());
-		this.recolecta...
+	public void procesa(Pf_valor pf) {
+		pf.getTipo().procesa(this);
+		this.add(pf.getId(), pf);
+		
 	}
 	
-	public void vincula1(Pf_ref pf) {
-		this.vincula1(pf.getTipo());
-		this.recolecta...
+	public void procesa(Pf_ref pf) {
+		pf.getTipo().procesa(this);
+		this.add(pf.getId(), pf);
 	}
 	
-	public void vincula1(Pf_muchos pf) {
-		this.vincula1(pf.getPforms());
-		this.vincula1(pf.getPf());
+	public void procesa(Pf_muchos pf) {
+		pf.getPforms().procesa(this);
+		pf.getPf().procesa(this);
 	}
 	
-	public void vincula1(Pf_vacio pf) {}
+	public void procesa(Pf_vacio pf) {}
 	
-	public void vincula1(Pf_uno pf) {
-		this.vincula1(pf.getPf());
+	public void procesa(Pf_uno pf) {
+		pf.getPf().procesa(this);
 	}
-	
+	/*
 	public void vincula2(Pf_valor pf) {
 		this.vincula2(pf.getTipo());
 	}
@@ -315,6 +277,7 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	public void vincula2(Pf_ref pf) {
 		this.vincula2(pf.getTipo());
 	}
+	*/
 	
 	public void procesa(Pr pr) {
 		pr.getExp().procesa(this);
@@ -332,11 +295,13 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	// Expresiones
 	
 	public void procesa(Id id) {
-		if(!existeId(id.id())) {
-			id.setVinculo(getDec(id.id())); // No sé si es getDec o no
+		int x = 30;
+		if(existeId(id.id().toString())) {
+			id.setVinculo(valorDe(id.id().toString())); // No sé si es getDec o no
 		}
 		else {
-			// LANZAREMOS ERROR
+        	System.out.println("ERROR: Id");
+			errores.add(tipoError.idNoDeclarado + ": " + id.toString());
 		}
 	}
 	
@@ -489,23 +454,25 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	public void procesa(Seq seq) {
 		this.abreNivel();
-		this.vincula1(seq.getDecs());
-		this.vincula2(seq.getDecs());
+		seq.getDecs().procesa(this);
+		seq.getDecs().procesa(new Procesa2());
 		seq.getIns().procesa(this);
 		this.cierraNivel();
 	}
 	
 	public void procesa(Invoc_proc inv) {
-		if(this.existeId(inv.getId())) {
+		if(this.existeId(inv.getId().toString())) {
 			inv.setVinculo(valorDe(inv.getId().toString()));
 		}
 		else {
+        	System.out.println("ERROR: " + inv.getId().toString() + " - InvocProc");
 			errores.add(tipoError.idNoDeclarado + ": " + inv.getId().toString());
 		}
 		inv.getPreales().procesa(this);
 	}
 	
 	
+	// Segunda pasada
 	private class Procesa2 extends ProcesamientoPorDefecto{
 		
 		public void procesa(Decs_muchas decs) {
@@ -516,6 +483,83 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		public void procesa(Decs_una dec) {
 			dec.dec().procesa(this);
 		}
+		
+		public void procesa(Decs_vacia dec) {}
+		
+		public void procesa(DecTipo dec) {
+			dec.getTipo().procesa(this);
+		}
+		
+		public void procesa(DecVar dec) {
+			dec.getTipo().procesa(this);
+		}
+		
+		public void procesa(DecProc dec) {
+			dec.getPforms().procesa(this);
+		}
+		
+		public void procesa(Int int_) {}
+		
+		public void procesa(Bool bool_) {}
+		
+		public void procesa(Real real_) {}
+		
+		public void procesa(StringTipo string_) {}
+		
+		public void procesa(Null null_) {}
+		
+		public void procesa(Array arr) {
+			arr.getTipo().procesa(this);
+		}
+		
+		public void procesa(RecordTipo rec) {
+			rec.getCampos().procesa(this);
+		}
+		
+		public void procesa(Pointer p) {
+			if (p.getEnumTipo() == EnumTipo.REF) {
+				Tipo apuntado = p.getApuntado();
+				Ref r = (Ref)apuntado; 
+				if(existeId(r.getId().toString())) {
+					p.setVinculo(valorDe(r.getId().toString()));
+				}
+				else {
+		        	System.out.println("ERROR:");
+					errores.add(tipoError.idNoDeclarado + ": " + r.getId().toString());
+				}
+			}
+			else {
+				p.getTipo().procesa(this);
+			}
+		}
+		
+		public void procesa(Ref ref) {}
+		
+		public void procesa(Campo campo) {
+			campo.getTipo().procesa(this);
+		}
+		
+		public void procesa(Campos_muchos campos) {
+			campos.getCampos().procesa(this);
+			campos.getCampo().procesa(this);
+		}
+		
+		public void procesa(Campos_uno campo) {
+			campo.getCampo().procesa(this);
+		}
+		
+		public void procesa(Pf_valor pf) {
+			pf.getTipo().procesa(this);
+		}
+		
+		public void procesa(Pf_ref pf) {
+			pf.getTipo().procesa(this);
+		}
+		
+		
+		
+		
+		
 	}
 	
 	

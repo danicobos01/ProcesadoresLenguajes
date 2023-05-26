@@ -4,7 +4,7 @@ import patron_visitor.asint.TinyASint.*;
 
 public class NodoAST {
 
-	public StringLocalizado s;
+	public SL s;
 	public EnumTipo tipo;
 	public NodoAST vinculo;
 
@@ -30,7 +30,7 @@ public class NodoAST {
 	
 
 	public String toString() {
-		return "Nodo: " + Integer.toString(s.fila()) + "-" + Integer.toString(s.col());
+		return "Nodo: " + s.toString(); // Integer.toString(s.fila()) + "-" + Integer.toString(s.col());
 	}
 }
 

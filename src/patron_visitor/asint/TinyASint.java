@@ -12,17 +12,17 @@ public class TinyASint {
        public abstract void procesa(Procesamiento procesamiento);
     }
     
-    public static class StringLocalizado {
+    public static class SL {
      private String s;
      private int fila;
      private int col;
-     public StringLocalizado(String s, int fila, int col) {
+     public SL(String s, int fila, int col) {
          this.s = s;
          this.fila = fila;
          this.col = col;
      }
      
-     public StringLocalizado(String s) {
+     public SL(String s) {
     	 this.s = s;
      }
      
@@ -37,8 +37,8 @@ public class TinyASint {
      }
      public boolean equals(Object o) {
          return (o == this) || (
-                (o instanceof StringLocalizado) &&
-                (((StringLocalizado)o).s.equals(s)));                
+                (o instanceof SL) &&
+                (((SL)o).s.equals(s)));                
      }
      public int hashCode() {
          return s.hashCode();
@@ -297,7 +297,7 @@ public class TinyASint {
     }
     
     
-    // Nivel 5: Operadores de indexaci�n, de acceso a registro y de indirecci�n.
+    // Nivel 5: Operadores de indexaci�n, de acceso a registro y de fci�n.
     
     public static class Index extends ExpBin{ // [ E ]
     	
@@ -312,14 +312,14 @@ public class TinyASint {
     }
     
     public static class AccesoRegistro extends ExpUnario { // .c
-		private StringLocalizado id;
+		private SL id;
 
-		public AccesoRegistro(Exp exp, StringLocalizado id) {
+		public AccesoRegistro(Exp exp, SL id) {
 			super(exp);
 			this.id = id;
 		}
 
-		public StringLocalizado getId() {
+		public SL getId() {
 			return this.id;
 		}
 
@@ -329,14 +329,14 @@ public class TinyASint {
     }
     
     public static class Indireccion extends ExpUnario{ // ^
-		private StringLocalizado id;
+		private SL id;
 
-		public Indireccion(Exp exp, StringLocalizado id) {
+		public Indireccion(Exp exp, SL id) {
 			super(exp);
 			this.id = id;
 		}
 
-		public StringLocalizado getId() {
+		public SL getId() {
 			return this.id;
 		}
 
@@ -346,36 +346,36 @@ public class TinyASint {
     }
     
     public static class NumEnt extends Exp {
-        private StringLocalizado numEnt;
-        public NumEnt(StringLocalizado numEnt) {
+        private SL numEnt;
+        public NumEnt(SL numEnt) {
             super();
             this.numEnt = numEnt;
         }
-        public StringLocalizado num() {return numEnt;}
+        public SL num() {return numEnt;}
         public void procesa(Procesamiento p) {
            p.procesa(this); 
         }     
     }
     
     public static class NumReal extends Exp {
-        private StringLocalizado numReal;
-        public NumReal(StringLocalizado numReal) {
+        private SL numReal;
+        public NumReal(SL numReal) {
             super();
             this.numReal = numReal;
         }
-        public StringLocalizado num() {return numReal;}
+        public SL num() {return numReal;}
         public void procesa(Procesamiento p) {
            p.procesa(this); 
         }     
     }
     
     public static class Id extends Exp {
-        private StringLocalizado id;
-        public Id(StringLocalizado id) {
+        private SL id;
+        public Id(SL id) {
             super();
             this.id = id;
         }
-        public StringLocalizado id() {return id;}
+        public SL id() {return id;}
         public void procesa(Procesamiento p) {
            p.procesa(this); 
         }   
@@ -386,7 +386,7 @@ public class TinyASint {
     }
     
     public static class TrueExp extends Exp {
-        private StringLocalizado exp = new StringLocalizado("True");
+        private SL exp = new SL("True");
         public TrueExp() {
             super();
         }
@@ -397,7 +397,7 @@ public class TinyASint {
     }
     
     public static class FalseExp extends Exp {
-        private StringLocalizado exp = new StringLocalizado("False");
+        private SL exp = new SL("False");
         public FalseExp() {
             super();
         }
@@ -408,7 +408,7 @@ public class TinyASint {
     }
     
     public static class NullExp extends Exp {
-        private StringLocalizado exp = new StringLocalizado("Null");
+        private SL exp = new SL("Null");
         public NullExp() {
             super();
         }
@@ -419,8 +419,8 @@ public class TinyASint {
     }
     
     public static class StringExp extends Exp {
-        private StringLocalizado str;
-        public StringExp(StringLocalizado str) {
+        private SL str;
+        public StringExp(SL str) {
             super();
             this.str = str;
         }
@@ -537,8 +537,8 @@ public class TinyASint {
     
     public static class Array extends Tipo{
     	int nElems;
-    	EnumTipo tipoElems;
-    	public Array(int n, EnumTipo tipo) {
+    	Tipo tipoElems;
+    	public Array(int n, Tipo tipo) {
     		super(EnumTipo.ARRAY);
     		this.nElems = n;
     		this.tipoElems = tipo;
@@ -552,7 +552,7 @@ public class TinyASint {
     	public Array getTipo() {
 			return this;
 		}
-    	public EnumTipo getTipoElems() {
+    	public Tipo getTipoElems() {
     		return this.tipoElems;
     	}
     	public int getNElems() {
@@ -610,8 +610,8 @@ public class TinyASint {
     }
     
     public static class Ref extends Tipo{
-    	StringLocalizado id;
-    	public Ref(StringLocalizado id) {
+    	SL id;
+    	public Ref(SL id) {
     		super(EnumTipo.REF);
     		this.id = id;
     	}
@@ -626,20 +626,20 @@ public class TinyASint {
 		public Ref getTipo() {
 			return this;
 		}
-		public StringLocalizado getId() {
+		public SL getId() {
 			return this.id;
 		}
 		
     }
     
     public static class Campo extends NodoAST {
-    	private StringLocalizado id; 
+    	private SL id; 
     	private Tipo tipo;
-    	public Campo(StringLocalizado id, Tipo tipo) {
+    	public Campo(SL id, Tipo tipo) {
     		this.id = id; 
     		this.tipo = tipo;
     	}
-    	public StringLocalizado getId() {
+    	public SL getId() {
     		return this.id;
     	}
     	public Tipo getTipo() {
@@ -647,6 +647,9 @@ public class TinyASint {
     	}
     	public EnumTipo getEnumTipo() {
     		return this.tipo.getEnumTipo();
+    	}
+    	public void procesa(Procesamiento p) {
+    		p.procesa(this);
     	}
     }
     
@@ -672,7 +675,7 @@ public class TinyASint {
     public static class Campos_muchos extends Campos{
     	Campo campo;
     	Campos campos;
-		public Campos_muchos(Campo campo, Campos campos) {
+		public Campos_muchos(Campos campos, Campo campo) {
 			this.campo = campo;
 			this.campos = campos;
 		}
@@ -690,11 +693,11 @@ public class TinyASint {
     
     
     public static class Dec extends NodoAST {
-        private StringLocalizado id;
-        public Dec(StringLocalizado id) {
+        private SL id;
+        public Dec(SL id) {
             this.id = id;
         }
-        public StringLocalizado id() {return id;}
+        public SL id() {return id;}
         public void procesa(Procesamiento p) {
            p.procesa(this); 
         }     
@@ -744,7 +747,7 @@ public class TinyASint {
     
     public static class DecVar extends Dec { 
     	Tipo tipo;
-    	public DecVar(StringLocalizado id, Tipo tipo) {
+    	public DecVar(Tipo tipo, SL id) {
     		super(id);
     		this.tipo = tipo;
     	}
@@ -760,7 +763,7 @@ public class TinyASint {
     
     public static class DecTipo extends Dec { 
     	Tipo tipo;
-    	public DecTipo(StringLocalizado id, Tipo tipo) {
+    	public DecTipo(SL id, Tipo tipo) {
     		super(id);
     		this.tipo = tipo;
     	}
@@ -777,7 +780,7 @@ public class TinyASint {
     	Pforms pforms;
     	Instrucciones ins;
     	Decs decs;
-    	public DecProc(StringLocalizado id, Pforms pforms, Instrucciones ins, Decs decs) {
+    	public DecProc(SL id, Pforms pforms, Instrucciones ins, Decs decs) {
     		super(id);
     		this.pforms = pforms;
     		this.ins = ins;
@@ -1052,15 +1055,15 @@ public class TinyASint {
     }
     
     public static class Invoc_proc extends Instruccion{
-    	private StringLocalizado id;
+    	private SL id;
     	private PReales preales;
     	
-    	public Invoc_proc(StringLocalizado id, PReales preales) {
+    	public Invoc_proc(SL id, PReales preales) {
     		this.id = id;
     		this.preales = preales;
     	}
     	
-    	public StringLocalizado getId() {
+    	public SL getId() {
     		return this.id;
     	}
     	
@@ -1076,13 +1079,13 @@ public class TinyASint {
           
     
     public static abstract class Pf extends NodoAST{
-    	private String id;
+    	private SL id;
     	private Tipo tipo;
-    	public Pf(String id, Tipo tipo) {
+    	public Pf(SL id, Tipo tipo) {
     		this.id = id;
     		this.tipo = tipo;
     	}
-    	public String getId() {
+    	public SL getId() {
     		return this.id;
     	}
     	public Tipo getTipo() {
@@ -1092,7 +1095,7 @@ public class TinyASint {
     }
     
     public static class Pf_ref extends Pf{
-		public Pf_ref(String id, Tipo tipo) {
+		public Pf_ref(SL id, Tipo tipo) {
 			super(id, tipo);
 		}
 		public void procesa(Procesamiento p) {
@@ -1101,7 +1104,7 @@ public class TinyASint {
     }
     
     public static class Pf_valor extends Pf{
-		public Pf_valor(String id, Tipo tipo) {
+		public Pf_valor(SL id, Tipo tipo) {
 			super(id, tipo);
 		}
 		public void procesa(Procesamiento p) {
@@ -1245,8 +1248,8 @@ public class TinyASint {
     public static class Prog_con_decs extends Prog {
       private Instrucciones ins;
       private Decs decs;
-       public Prog_con_decs(Instrucciones ins, Decs decs) {
-          super(ins);
+       public Prog_con_decs(Decs decs, Instrucciones ins) {
+          super(decs, ins);
           this.ins = ins;
           this.decs = decs;
        }   
@@ -1258,15 +1261,15 @@ public class TinyASint {
     }
 
      // Constructoras   
-    public StringLocalizado strl(String s, int fila, int col) {
-        return new StringLocalizado(s,fila,col);
+    public SL strl(String s, int fila, int col) {
+        return new SL(s,fila,col);
     }
-    public StringLocalizado strl(String s) {
-        return new StringLocalizado(s);
+    public SL strl(String s) {
+        return new SL(s);
     }
     
     public Prog prog_con_decs(Instrucciones ins, Decs decs) {
-        return new Prog_con_decs(ins,decs);
+        return new Prog_con_decs(decs, ins);
     }
     public Prog prog_sin_decs(Instrucciones ins) {
         return new Prog_sin_decs(ins);
@@ -1287,16 +1290,16 @@ public class TinyASint {
     public Exp mod(Exp arg0, Exp arg1) {
         return new Mod(arg0,arg1);
     }
-    public Exp numEnt(StringLocalizado num) {
+    public Exp numEnt(SL num) {
         return new NumEnt(num);
     }
-    public Exp numReal(StringLocalizado num) {
+    public Exp numReal(SL num) {
         return new NumReal(num);
     }
-    public Exp id(StringLocalizado num) {
+    public Exp id(SL num) {
         return new Id(num);
     }
-    public Dec dec(StringLocalizado id, StringLocalizado val) {
+    public Dec dec(SL id, SL val) {
         return new Dec(id);
     }
     public Decs decs_una(Dec dec) {
@@ -1306,15 +1309,15 @@ public class TinyASint {
         return new Decs_muchas(decs,dec);
     }
     
-    public Dec decVar(StringLocalizado id, Tipo tipo) {
+    public Dec decVar(SL id, Tipo tipo) {
     	return new DecVar(id, tipo);
     }
     
-    public Dec decTipo(StringLocalizado id, Tipo tipo) {
+    public Dec decTipo(SL id, Tipo tipo) {
     	return new DecTipo(id, tipo);
     }
     
-    public Dec decProc(StringLocalizado id, Pforms pforms, Instrucciones ins, Decs decs) {
+    public Dec decProc(SL id, Pforms pforms, Instrucciones ins, Decs decs) {
     	return new DecProc(id, pforms, ins, decs);
     }
     

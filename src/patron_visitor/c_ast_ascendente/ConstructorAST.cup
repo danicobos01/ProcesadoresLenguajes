@@ -6,7 +6,7 @@ import asint.TinyASint.Prog;
 import asint.TinyASint.Exp;
 import asint.TinyASint.Decs;
 import asint.TinyASint.Dec;
-import asint.TinyASint.StringLocalizado;
+import asint.TinyASint.SL;
 
 
 scan with {: return getScanner().next_token(); :};
@@ -27,7 +27,7 @@ init with {:
 
 
 terminal  MAS, MENOS, POR, DIV, PAP, PCIERRE, DONDE, EVALUA, COMA, IGUAL;
-terminal StringLocalizado NUM, ID;
+terminal SL NUM, ID;
 
 non terminal  Prog Prog;
 non terminal  Decs PDonde, Decs;

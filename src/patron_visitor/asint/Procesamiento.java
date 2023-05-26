@@ -31,7 +31,7 @@ public interface Procesamiento {
     void procesa(RecordTipo tipo);
     void procesa(Pointer pointer);
     void procesa(Ref ref);
-    
+    void procesa(Campo campo);
     void procesa(Campos_muchos campos);
     void procesa(Campos_uno campo);
 
