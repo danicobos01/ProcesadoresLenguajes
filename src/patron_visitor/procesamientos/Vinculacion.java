@@ -509,7 +509,7 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		public void procesa(Null null_) {}
 		
 		public void procesa(Array arr) {
-			arr.getTipo().procesa(this);
+			arr.getTipoElems().procesa(this);
 		}
 		
 		public void procesa(RecordTipo rec) {

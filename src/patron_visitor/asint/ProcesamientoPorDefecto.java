@@ -67,5 +67,7 @@ public class ProcesamientoPorDefecto implements Procesamiento {
 	public void procesa(Delete ins) {}
 	public void procesa(Pf_ref pf) {}
 	public void procesa(Pf_valor pf) {}
-	public void procesa(PReales pf) {}   
+	public void procesa(Pr pr) {}
+	public void procesa(PReales pf) {}
+	public void procesa(Campo campo) {}   
 }

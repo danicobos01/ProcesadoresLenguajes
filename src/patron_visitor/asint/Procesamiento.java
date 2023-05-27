@@ -67,6 +67,7 @@ public interface Procesamiento {
     void procesa(Pf_ref pf);
     void procesa(Pf_valor pf);
     void procesa(PReales pf);
+    void procesa(Pr pr);
     void procesa(Prog_sin_decs prog);    
     void procesa(Prog_con_decs prog);    
 }

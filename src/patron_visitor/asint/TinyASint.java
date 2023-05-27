@@ -329,16 +329,18 @@ public class TinyASint {
     }
     
     public static class Indireccion extends ExpUnario{ // ^
-		private SL id;
+		// private SL id;
 
-		public Indireccion(Exp exp, SL id) {
+		public Indireccion(Exp exp /* SL id */) {
 			super(exp);
-			this.id = id;
+			// this.id = id;
 		}
 
+		/*
 		public SL getId() {
 			return this.id;
 		}
+		*/
 
 		public void procesa(Procesamiento p) {
 			p.procesa(this);
@@ -598,8 +600,8 @@ public class TinyASint {
 		public EnumTipo getEnumTipo() {
 			return EnumTipo.POINTER;
 		}
-		public Pointer getTipo() {
-			return this;
+		public Tipo getTipo() {
+			return this.apuntado.getTipo();
 		}
     	public Tipo getApuntado() {
     		return this.apuntado;
@@ -1160,7 +1162,7 @@ public class TinyASint {
 		}
     }
     
-    public static abstract class Pr extends NodoAST{
+    public static class Pr extends Exp{
     	private Exp exp;
     	public Pr(Exp exp) {
     		this.exp = exp;
@@ -1168,7 +1170,9 @@ public class TinyASint {
     	public Exp getExp() {
     		return this.exp;
     	}
-    	public abstract void procesa(Procesamiento p);
+    	public void procesa(Procesamiento p) {
+    		p.procesa(this);
+    	}
     }
     
     public abstract static class PReales extends Decs{
@@ -1310,7 +1314,7 @@ public class TinyASint {
     }
     
     public Dec decVar(SL id, Tipo tipo) {
-    	return new DecVar(id, tipo);
+    	return new DecVar(tipo, id);
     }
     
     public Dec decTipo(SL id, Tipo tipo) {
