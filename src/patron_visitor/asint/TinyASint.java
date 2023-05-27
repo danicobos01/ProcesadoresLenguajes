@@ -434,7 +434,7 @@ public class TinyASint {
     
     
     public enum EnumTipo {
-		INT, REAL, STRING, BOOL, ID, POINTER, ARRAY, RECORD, ERROR, OK, NULL, REF
+		INT, REAL, STRING, BOOL, ID, POINTER, ARRAY, RECORD, ERROR, OK, NULL, REF, TRUE, FALSE
 	}
     
     public static abstract class Tipo extends NodoAST{
@@ -538,11 +538,11 @@ public class TinyASint {
     }
     
     public static class Array extends Tipo{
-    	int nElems;
+    	SL nElems;
     	Tipo tipoElems;
-    	public Array(int n, Tipo tipo) {
+    	public Array(SL nElems, Tipo tipo) {
     		super(EnumTipo.ARRAY);
-    		this.nElems = n;
+    		this.nElems = nElems;
     		this.tipoElems = tipo;
     	}
     	public void procesa(Procesamiento p) {
@@ -557,7 +557,7 @@ public class TinyASint {
     	public Tipo getTipoElems() {
     		return this.tipoElems;
     	}
-    	public int getNElems() {
+    	public SL getNElems() {
     		return this.nElems;
     	}
     }
@@ -655,7 +655,7 @@ public class TinyASint {
     	}
     }
     
-    public static abstract class Campos extends Vector<Campo>{
+    public static abstract class Campos extends NodoAST{
     	public Campos() {
         }
         public abstract void procesa(Procesamiento p);

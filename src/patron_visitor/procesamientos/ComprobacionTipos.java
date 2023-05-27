@@ -1,5 +1,8 @@
+package patron_visitor.procesamientos;
 
-
+import patron_visitor.asint.NodoAST;
+import patron_visitor.asint.ProcesamientoPorDefecto;
+import patron_visitor.asint.TinyASint.*;
 
 public class ComprobacionTipos extends ProcesamientoPorDefecto {
 	
@@ -17,141 +20,557 @@ public class ComprobacionTipos extends ProcesamientoPorDefecto {
 		return false;
 	}
 	
-// Programa
-
-	public void procesa(Programa prog) {
-		if(prog.declaraciones() != null) {
-			prog.declaraciones().procesa(this);
+	public EnumTipo ambosOk(EnumTipo first, EnumTipo second) {
+		if(first == EnumTipo.OK && second == EnumTipo.OK) {
+			return EnumTipo.OK;
+		}else {
+			return EnumTipo.ERROR;
+		}		
+	}
+	
+	
+	// Hay que hacer varias
+	public boolean sonCompatibles(Exp first, Exp second) {
+		if(first.getTipoNodo() == second.getTipoNodo()) {
+			return true;
 		}
-		prog.instrucciones().procesa(this);
-		prog.setTipo(prog.instrucciones().getTipo());
+		else { 
+			return false;
+		}
 	}
 	
-	// Declaraciones
-
+	public boolean esDesignador(NodoAST nodo) {
+		if(nodo instanceof Id || nodo instanceof Index || nodo instanceof Indireccion || nodo instanceof AccesoRegistro) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	
+	public void procesa(Prog_con_decs prog) {
+		prog.getDeclaraciones().procesa(this);
+		prog.getInstrucciones().procesa(this);
+		prog.setTipoNodo(ambosOk(prog.getDeclaraciones().getTipoNodo(), prog.getInstrucciones().getTipoNodo()));
+	}
+	
+	public void procesa(Prog_sin_decs prog) {
+		prog.getInstrucciones().procesa(this);
+		prog.setTipoNodo(prog.getInstrucciones().getTipoNodo());
+	}
+	
 	public void procesa(Decs_muchas decs) {
-		decs.declaraciones().procesa(this);
-		decs.declaracion().procesa(this);
-	}
-
-	public void procesa(Decs_una decs) {
-		decs.declaracion().procesa(this);
+		decs.decs().procesa(this);
+		decs.dec().procesa(this);
 	}
 	
-	@Override
-	public void procesa(DecProc dec) {
-		dec.pforms().procesa(this);
-		dec.bloque().procesa(this);
+	public void procesa(Decs_una dec) {
+		dec.dec().procesa(this);
 	}
 	
-	@Override
-	public void procesa(DecTipo dec) {
-		dec.val().procesa(this);
-	}
-
-	@Override
+	public void procesa(Decs_vacia decs) {}
+	
 	public void procesa(DecVar dec) {
-		dec.val().procesa(this);
-		dec.setTipo(dec.val().getTipo());
+		dec.getTipo().procesa(this);
+		dec.setTipoNodo(dec.getTipoNodo());
 	}
+	
+	public void procesa(DecTipo dec) {
+		dec.getTipo().procesa(this);
+		dec.setTipoNodo(dec.getTipoNodo());
+	}
+	
+	public void procesa(DecProc dec) {
+		dec.getPforms().procesa(this);
+		dec.getDecs().procesa(this);
+		dec.getIns().procesa(this);
+		dec.setTipoNodo(ambosOk(dec.getPforms().getTipoNodo(), ambosOk(dec.getDecs().getTipoNodo(), dec.getIns().getTipoNodo())));
+	}
+
+	public void procesa(Int int_) {
+		int_.setTipoNodo(EnumTipo.OK);
+	}
+	public void procesa(Real real) {
+		real.setTipoNodo(EnumTipo.OK);
+	}
+	public void procesa(Bool bool) {
+		bool.setTipoNodo(EnumTipo.OK);
+	}
+	public void procesa(StringTipo str) {
+		str.setTipoNodo(EnumTipo.OK);
+	}
+	public void procesa(Null null_) {
+		null_.setTipoNodo(EnumTipo.OK);
+	}
+	
+	public void procesa(Array arr) {
+		arr.getTipoElems().procesa(this);
+		try {
+            Integer.parseInt(arr.getNElems().toString());
+            arr.setTipoNodo(arr.getTipoElems().getEnumTipo());
+        } catch (NumberFormatException e) {
+        	arr.setTipoNodo(EnumTipo.ERROR);
+        }
+	}
+	
+	public void procesa(RecordTipo rec) {
+		rec.getCampos().procesa(this);
+		rec.setTipoNodo(EnumTipo.OK);
+	}
+	
+	public void procesa(Pointer p) {
+		p.getTipo().procesa(this);
+		p.setTipoNodo(EnumTipo.OK);
+	}
+	
+	public void procesa(Ref ref) {
+		if(ref.getVinculo() instanceof DecTipo) {
+			ref.setTipoNodo(EnumTipo.OK);
+		}
+		else {
+			// error
+			ref.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(Campo campo) {
+		campo.getTipo().procesa(this);
+		campo.setTipoNodo(campo.getTipoNodo());
+	}
+	
+	public void procesa(Campos_muchos campos) {
+		campos.getCampo().getTipo().procesa(this);
+		campos.getCampo().getTipo().procesa(this);
+		campos.setTipoNodo(campos.getCampo().getTipoNodo());
+	}
+	
+	public void procesa(Campos_uno campos) {
+		campos.getCampo().getTipo().procesa(this);
+		campos.setTipoNodo(campos.getCampo().getTipoNodo());
+	}
+	
+	// Parámetros
+	
+	public void procesa(Pf_muchos pf) {
+		pf.getPforms().procesa(this);
+		pf.getPf().procesa(this);
+		pf.setTipoNodo(ambosOk(pf.getPforms().getTipoNodo(), pf.getPf().getTipoNodo()));
+	}
+	
+	public void procesa(Pf_uno pf) {
+		if(pf.getPf().getTipoNodo() == EnumTipo.OK) {
+			pf.setTipoNodo(EnumTipo.OK);
+		}
+	}
+	
+	public void procesa(Pf_vacio pf) {
+		pf.setTipoNodo(EnumTipo.OK);
+	}
+	
+	public void procesa(Pr_muchos pr) {
+		pr.getPreales().procesa(this);
+		pr.getPr().procesa(this);
+		pr.setTipoNodo(ambosOk(pr.getPreales().getTipoNodo(), pr.getPr().getTipoNodo()));
+	}
+	
+	public void procesa(Pr_uno pr) {
+		if(pr.getPr().getTipoNodo() == EnumTipo.OK) {
+			pr.setTipoNodo(EnumTipo.OK);
+		}
+	}
+	
+	public void procesa(Pr_vacio pr) {
+		pr.setTipoNodo(EnumTipo.OK);
+	}
+	
+	public void procesa(Pf_valor p) {
+		p.getTipo().procesa(this);
+		p.setTipoNodo(p.getTipo().getTipoNodo());
+	}
+	
+	public void procesa(Pf_ref p) {
+		p.getTipo().procesa(this);
+		p.setTipoNodo(p.getTipo().getTipoNodo());
+	}
+	
+	public void procesa(Pr p) {
+		p.getExp().procesa(this);
+		p.setTipoNodo(p.getExp().getTipoNodo());
+	}
+	
+	// CHECK PARAMETROS 
+	
+	
+	
 	
 	// Instrucciones
-	
-	public void procesa(Insts_muchas insts) {
-		insts.instrucciones().procesa(this);
-		insts.instruccion().procesa(this);
-		if (insts.instrucciones().getTipo() == tNodo.OK
-			&& insts.instruccion().getTipo() == tNodo.OK) {
-			insts.setTipo(tNodo.OK);
-		} else {
-			printError(insts);
+	public void procesa(Asignacion ins) {
+		ins.getFirst().procesa(this);
+		ins.getSecond().procesa(this);
+		if(esDesignador(ins.getFirst())) {
+			if(sonCompatibles(ins.getFirst(), ins.getSecond())) {
+				ins.setTipoNodo(EnumTipo.OK);
+			}
+			else {
+				// error - no compatibles
+				ins.setTipoNodo(EnumTipo.ERROR);
+			}
+		}
+		else {
+			// error - no designador
+			ins.setTipoNodo(EnumTipo.ERROR);
 		}
 	}
-
-	public void procesa(Insts_una insts) {
-		insts.instruccion().procesa(this);
-		insts.setTipo(insts.instruccion().getTipo());
-	}
 	
-	@Override
-	public void procesa(Lista_inst_empty lista_inst_empty) {
-		lista_inst_empty.setTipo(tNodo.OK);
-	}
-
-	@Override
-	public void procesa(Lista_inst_una lista_inst_una) {
-		lista_inst_una.instruccion().procesa(this);
-		lista_inst_una.setTipo(lista_inst_una.instruccion().getTipo());
-	}
-
-	@Override
-	public void procesa(Lista_inst_muchas lista_inst_muchas) {
-		lista_inst_muchas.instrucciones().procesa(this);
-		lista_inst_muchas.instruccion().procesa(this);
-		if (lista_inst_muchas.instrucciones().getTipo() == tNodo.OK
-			&& lista_inst_muchas.instruccion().getTipo() == tNodo.OK) {
-			lista_inst_muchas.setTipo(tNodo.OK);
-			
-		} else {
-			printError(lista_inst_muchas);
+	public void procesa(If_then ins) {
+		ins.getExp().procesa(this);
+		ins.getIns().procesa(this);
+		if(ins.getExp().getTipoNodo() == EnumTipo.BOOL && ins.getIns().getTipoNodo() == EnumTipo.OK) { // MIRAR LO DE SI PUEDE SER BOOL O YA HA SIDO SOBREESCRITO PARA SER OK
+			ins.setTipoNodo(EnumTipo.OK);
 		}
 	}
+	
+	public void procesa(If_then_else ins) {
+		ins.getExp().procesa(this);
+		ins.getIns1().procesa(this);
+		ins.getIns2().procesa(this);
+		if(ins.getExp().getTipoNodo() == EnumTipo.BOOL && ambosOk(ins.getIns1().getTipoNodo(), ins.getIns2().getTipoNodo()) == EnumTipo.OK) { // MIRAR LO DE SI PUEDE SER BOOL O YA HA SIDO SOBREESCRITO PARA SER OK
+			ins.setTipoNodo(EnumTipo.OK);
+		}
+	}
+	
+	public void procesa(While ins) {
+		ins.getExp().procesa(this);
+		ins.getIns().procesa(this);
+		if(ins.getExp().getTipoNodo() == EnumTipo.BOOL && ins.getIns().getTipoNodo() == EnumTipo.OK) { // MIRAR LO DE SI PUEDE SER BOOL O YA HA SIDO SOBREESCRITO PARA SER OK
+			ins.setTipoNodo(EnumTipo.OK);
+		}
+	}
+	
+	public void procesa(Read ins) {
+		ins.getExp().procesa(this);
+		if((ins.getTipoNodo() == EnumTipo.INT || ins.getTipoNodo() == EnumTipo.REAL
+				|| ins.getTipoNodo() == EnumTipo.BOOL || ins.getTipoNodo() == EnumTipo.STRING)
+					&& esDesignador(ins.getExp())) {
+			ins.setTipoNodo(EnumTipo.OK);
+		}else {
+			ins.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(Write ins) {
+		ins.getExp().procesa(this);
+		if(ins.getTipoNodo() == EnumTipo.INT || ins.getTipoNodo() == EnumTipo.REAL
+				|| ins.getTipoNodo() == EnumTipo.BOOL || ins.getTipoNodo() == EnumTipo.STRING) {
+			ins.setTipoNodo(EnumTipo.OK);
+		}else {
+			ins.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(NewLine ins) {
+		ins.setTipoNodo(EnumTipo.OK);
+	}
+	
+	public void procesa(New ins) {
+		ins.getExp().procesa(this);
+		if(ins.getExp().getTipoNodo() == EnumTipo.POINTER) {
+			ins.setTipoNodo(EnumTipo.OK);
+		}
+		else {
+			// error
+			ins.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(Delete ins) {
+		ins.getExp().procesa(this);
+		if(ins.getExp().getTipoNodo() == EnumTipo.POINTER) {
+			ins.setTipoNodo(EnumTipo.OK);
+		}
+		else {
+			// error
+			ins.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(Seq ins) {
+		ins.getDecs().procesa(this);
+		ins.getIns().procesa(this);
+		ins.setTipoNodo(ins.getIns().getTipoNodo());
+	}
+	
+	// INVOC PROC HACERLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO
+	
+	public void procesa(Ins_muchas ins) {
+		ins.ins().procesa(this);
+		ins.in().procesa(this);
+		ins.setTipoNodo(ambosOk(ins.ins().getTipoNodo(), ins.in().getTipoNodo()));
+	}
+	
+	public void procesa(Ins_una ins) {
+		ins.in().procesa(this);
+		ins.setTipoNodo(ins.in().getTipoNodo());
+	}
+	
+	public void procesa (Ins_vacia ins) {
+		ins.setTipoNodo(EnumTipo.OK);
+	}
+	
 	
 	// Expresiones
 	
-	@Override
-	public void procesa(Lista_exp_empty lista_exp_empty) {
-		lista_exp_empty.setTipo(tNodo.OK);
+	public void procesa(Id exp) {
+		if (exp.getVinculo() instanceof DecVar)
+            exp.setTipoNodo(((DecVar) exp.getVinculo()).getTipoNodo());
+        else if (exp.getVinculo() instanceof Pf_valor)
+        	exp.setTipoNodo(((Pf_valor) exp.getVinculo()).getTipoNodo());
+        else if (exp.getVinculo() instanceof Pf_ref)
+        	exp.setTipoNodo(((Pf_ref) exp.getVinculo()).getTipoNodo());
+        else {
+        	// error
+        	exp.setTipoNodo(EnumTipo.ERROR);
+        }
 	}
-
-	@Override
-	public void procesa(Exp_muchas exp_muchas) {
-		exp_muchas.expresiones().procesa(this);
-		exp_muchas.expresion().procesa(this);
-		if (exp_muchas.expresiones().getTipo() == tNodo.OK) {
-			exp_muchas.setTipo(exp_muchas.expresion().getTipo());
-		} else {
-			printError(exp_muchas);
+	
+	public void procesa(NumEnt exp) {
+		exp.setTipoNodo(EnumTipo.INT);
+	}
+	public void procesa(NumReal exp) {
+		exp.setTipoNodo(EnumTipo.REAL);
+	}
+	public void procesa(TrueExp exp) {
+		exp.setTipoNodo(EnumTipo.TRUE);
+	}
+	public void procesa(FalseExp exp) {
+		exp.setTipoNodo(EnumTipo.FALSE);
+	}
+	public void procesa(StringExp exp) {
+		exp.setTipoNodo(EnumTipo.STRING);
+	}
+	public void procesa(NullExp exp) {
+		exp.setTipoNodo(EnumTipo.NULL);
+	}
+	
+	public void procesa(Not exp) {
+		exp.getExp().procesa(this);
+		if(exp.getExp().getTipoNodo() == EnumTipo.BOOL) {
+			exp.setTipoNodo(EnumTipo.BOOL);
+		}
+		else {
+			// error
+			exp.setTipoNodo(EnumTipo.ERROR);
 		}
 	}
-
-	@Override
-	public void procesa(Exp_una exp_una) {
-		exp_una.expresion().procesa(this);
-		exp_una.setTipo(exp_una.expresion().getTipo());
+	
+	public void procesa(MenosUnario exp) {
+		exp.getExp().procesa(this);
+		if(exp.getExp().getTipoNodo() == EnumTipo.INT) {
+			exp.setTipoNodo(EnumTipo.INT);
+		}
+		if(exp.getExp().getTipoNodo() == EnumTipo.REAL) {
+			exp.setTipoNodo(EnumTipo.REAL);
+		}
+		else {
+			// error
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
 	}
-
-	// Operadores
 	
 	public void procesa(Suma exp) {
-		exp.arg0().procesa(this);
-		exp.arg1().procesa(this);
-		
-		if (exp.arg0().getTipo() == tNodo.LIT_ENT && exp.arg1().getTipo() == tNodo.LIT_ENT) {
-			exp.setTipo(tNodo.LIT_ENT);
-		} else if (exp.arg0().getTipo() == tNodo.LIT_REAL && exp.arg1().getTipo() == tNodo.LIT_REAL) {
-			exp.setTipo(tNodo.LIT_REAL);
-		} else {
-			printError(exp);
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(exp.getFirst().getTipoNodo() == EnumTipo.INT && exp.getSecond().getTipoNodo() == EnumTipo.INT) {
+			exp.setTipoNodo(EnumTipo.INT);
+		}
+		else if(exp.getFirst().getTipoNodo() == EnumTipo.INT && exp.getSecond().getTipoNodo() == EnumTipo.REAL
+				|| exp.getFirst().getTipoNodo() == EnumTipo.REAL && exp.getSecond().getTipoNodo() == EnumTipo.INT
+					|| exp.getFirst().getTipoNodo() == EnumTipo.REAL && exp.getSecond().getTipoNodo() == EnumTipo.REAL) {
+			exp.setTipoNodo(EnumTipo.REAL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
 		}
 	}
 	
-		public void procesa(LitEnt exp) {
-		exp.setTipo(tNodo.LIT_ENT);
+	public void procesa(Resta exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(exp.getFirst().getTipoNodo() == EnumTipo.INT && exp.getSecond().getTipoNodo() == EnumTipo.INT) {
+			exp.setTipoNodo(EnumTipo.INT);
+		}
+		else if(exp.getFirst().getTipoNodo() == EnumTipo.INT && exp.getSecond().getTipoNodo() == EnumTipo.REAL
+				|| exp.getFirst().getTipoNodo() == EnumTipo.REAL && exp.getSecond().getTipoNodo() == EnumTipo.INT
+					|| exp.getFirst().getTipoNodo() == EnumTipo.REAL && exp.getSecond().getTipoNodo() == EnumTipo.REAL) {
+			exp.setTipoNodo(EnumTipo.REAL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
 	}
 	
-	public void procesa(LitReal exp) {
-		exp.setTipo(tNodo.LIT_REAL);
+	public void procesa(Mul exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(exp.getFirst().getTipoNodo() == EnumTipo.INT && exp.getSecond().getTipoNodo() == EnumTipo.INT) {
+			exp.setTipoNodo(EnumTipo.INT);
+		}
+		else if(exp.getFirst().getTipoNodo() == EnumTipo.INT && exp.getSecond().getTipoNodo() == EnumTipo.REAL
+				|| exp.getFirst().getTipoNodo() == EnumTipo.REAL && exp.getSecond().getTipoNodo() == EnumTipo.INT
+					|| exp.getFirst().getTipoNodo() == EnumTipo.REAL && exp.getSecond().getTipoNodo() == EnumTipo.REAL) {
+			exp.setTipoNodo(EnumTipo.REAL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
 	}
 	
-	//Tipo
-	
-	@Override
-	public void procesa(Int int1) {
-		int1.setTipo(tNodo.LIT_ENT);
+	public void procesa(Div exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(exp.getFirst().getTipoNodo() == EnumTipo.INT && exp.getSecond().getTipoNodo() == EnumTipo.INT) {
+			exp.setTipoNodo(EnumTipo.INT);
+		}
+		else if(exp.getFirst().getTipoNodo() == EnumTipo.INT && exp.getSecond().getTipoNodo() == EnumTipo.REAL
+				|| exp.getFirst().getTipoNodo() == EnumTipo.REAL && exp.getSecond().getTipoNodo() == EnumTipo.INT
+					|| exp.getFirst().getTipoNodo() == EnumTipo.REAL && exp.getSecond().getTipoNodo() == EnumTipo.REAL) {
+			exp.setTipoNodo(EnumTipo.REAL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
 	}
+	
+	public void procesa(Mod exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(exp.getFirst().getTipoNodo() == EnumTipo.INT && exp.getSecond().getTipoNodo() == EnumTipo.INT) {
+			exp.setTipoNodo(EnumTipo.INT);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(And exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(exp.getFirst().getTipoNodo() == EnumTipo.BOOL && exp.getSecond().getTipoNodo() == EnumTipo.BOOL) {
+			exp.setTipoNodo(EnumTipo.BOOL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(Or exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(exp.getFirst().getTipoNodo() == EnumTipo.BOOL && exp.getSecond().getTipoNodo() == EnumTipo.BOOL) {
+			exp.setTipoNodo(EnumTipo.BOOL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(Mayor exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(sonCompatibles(exp.getFirst(), exp.getSecond())) {
+			exp.setTipoNodo(EnumTipo.BOOL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(Menor exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(sonCompatibles(exp.getFirst(), exp.getSecond())) {
+			exp.setTipoNodo(EnumTipo.BOOL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(MayorIgual exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(sonCompatibles(exp.getFirst(), exp.getSecond())) {
+			exp.setTipoNodo(EnumTipo.BOOL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(MenorIgual exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(sonCompatibles(exp.getFirst(), exp.getSecond())) {
+			exp.setTipoNodo(EnumTipo.BOOL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(Igual exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(sonCompatibles(exp.getFirst(), exp.getSecond())) {
+			exp.setTipoNodo(EnumTipo.BOOL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	public void procesa(Distinto exp) {
+		exp.getFirst().procesa(this);
+		exp.getSecond().procesa(this);
+		if(sonCompatibles(exp.getFirst(), exp.getSecond())) {
+			exp.setTipoNodo(EnumTipo.BOOL);
+		}
+		else {
+			exp.setTipoNodo(EnumTipo.ERROR);
+		}
+	}
+	
+	
+	public void check_params() {
+		
+	}
+	
+	
+	
+}
+	
+		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
-	@Override
-	public void procesa(Real real) {
-		real.setTipo(tNodo.LIT_REAL);
-	}
+	

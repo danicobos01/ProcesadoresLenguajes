@@ -40,7 +40,7 @@ public class Vinculacion extends ProcesamientoPorDefecto {
         return false;
     }
 	
-	public enum tipoError {
+	private enum tipoError {
 		idDuplicado, idNoDeclarado
 	}
 	

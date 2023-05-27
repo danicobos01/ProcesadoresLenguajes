@@ -62,7 +62,7 @@ public class Main {
 	   				new Campo(new SL("der"), new Ref(new SL("tArbol"))))));
 	   Dec dectype3 = new DecTipo(new SL("tListaNombres"), new RecordTipo(
 	   		new Campos_muchos(new Campos_uno(
-	   				new Campo(new SL("nombres"), new Array(50, new StringTipo()))),
+	   				new Campo(new SL("nombres"), new Array(new SL("50"), new StringTipo()))),
 	   				new Campo(new SL("cont"), new Int()))));
 
 	   Dec decvar1 = new DecVar(new Ref(new SL("tListaNombres")), new SL("nombres"));
