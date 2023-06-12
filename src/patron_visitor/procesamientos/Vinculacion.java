@@ -71,8 +71,6 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	
 	
-	// VINCULACION DE LAS DISTINTAS CLASES
-	
 	public void procesa(Prog_con_decs prog) {
 		prog.getDeclaraciones().procesa(this);
 		prog.getDeclaraciones().procesa(new Procesa2());
@@ -90,8 +88,8 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		decs.dec().procesa(this);
 	}
 	
-	public void procesa(Decs_una dec) {
-		dec.dec().procesa(this);
+	public void procesa(Decs_una decs) {
+		decs.dec().procesa(this);
 	}
 	
 	public void vincula1(Decs_vacia decs) {}
@@ -116,32 +114,6 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		this.cierraNivel();
 	}
 	
-	/*
-	public void vincula2(Decs_muchas decs) {
-		this.vincula2(decs.decs());
-		this.vincula2(decs.dec());
-	}
-	
-	public void vincula2(Decs_una decs) {
-		this.vincula2(decs.dec());
-	}
-	
-	public void vincula2(Decs_vacia decs) {}
-	
-	public void vincula2(DecTipo dec) {
-		this.vincula2(dec.getTipo());
-	}
-	
-	public void vincula2(DecVar dec) {
-		this.vincula2(dec.getTipo());
-	}
-	
-	public void vincula2(DecProc dec) {
-		this.vincula2(dec.getPforms());
-	}
-	*/
-	
-	
 	// Tipos
 	
 	
@@ -164,7 +136,7 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	}
 	
 	public void procesa(Pointer pointer) {
-		if(pointer.getTipoApuntado() != EnumTipo.REF ) {
+		if ( !(pointer.getApuntado() instanceof Ref)) {	//Solo vincula si no es ref
 			pointer.getApuntado().procesa(this);
 		}
 	}
@@ -194,58 +166,6 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		campo.getCampo().procesa(this);
 	}
 	
-	/*
-	public void vincula2(Int int_) {}
-	
-	public void vincula2(Bool bool_) {}
-	
-	public void vincula2(Real real_) {}
-	
-	public void vincula2(StringTipo string_) {}
-	
-	public void vincula2(Null null_) {}
-	
-	public void vincula2(Array arr) {
-		this.vincula2(arr.getTipo());
-	}
-	
-	public void vincula2(RecordTipo rec) {
-		this.vincula2(rec.getCampos());
-	}
-	
-	public void vincula2(Pointer p) {
-		if (p.getEnumTipo() == EnumTipo.REF) {
-			Tipo apuntado = p.getApuntado();
-			Ref r = (Ref)apuntado; 
-			if(existeId(r.getId())) {
-				p.setVinculo(valorDe(r.getId().toString()));
-			}
-			else {
-				errores.add(tipoError.idNoDeclarado + ": " + r.getId().toString());
-			}
-		}
-		else {
-			this.vincula2(p.getTipo());
-		}
-	}
-	
-	public void vincula2(Ref ref) {}
-	
-	public void vincula2(Campo campo) {
-		this.vincula2(campo.getTipo());
-	}
-	
-	public void vincula2(Campos_muchos campos) {
-		this.vincula2(campos.getCampos());
-		this.vincula2(campos.getCampo());
-	}
-	
-	public void vincula2(Campos_uno campo) {
-		this.vincula2(campo.getCampo());
-	}
-	
-	*/
-	
 	// Parametros
 	
 	public void procesa(Pf_valor pf) {
@@ -269,15 +189,6 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	public void procesa(Pf_uno pf) {
 		pf.getPf().procesa(this);
 	}
-	/*
-	public void vincula2(Pf_valor pf) {
-		this.vincula2(pf.getTipo());
-	}
-	
-	public void vincula2(Pf_ref pf) {
-		this.vincula2(pf.getTipo());
-	}
-	*/
 	
 	public void procesa(Pr pr) {
 		pr.getExp().procesa(this);
@@ -295,9 +206,8 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	// Expresiones
 	
 	public void procesa(Id id) {
-		int x = 30;
 		if(existeId(id.id().toString())) {
-			id.setVinculo(valorDe(id.id().toString())); // No sé si es getDec o no
+			id.setVinculo(valorDe(id.id().toString()));
 		}
 		else {
         	System.out.println("ERROR: Id");
@@ -402,12 +312,12 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 	
 	// Instrucciones 
 	
-	public void procesa(Ins_una ins) {
+	public void procesa(Ins_muchas ins) {
+		ins.ins().procesa(this); 
 		ins.in().procesa(this);
 	}
 	
-	public void procesa(Ins_muchas ins) {
-		ins.ins().procesa(this); 
+	public void procesa(Ins_una ins) {
 		ins.in().procesa(this);
 	}
 	
@@ -480,8 +390,8 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 			decs.dec().procesa(this);
 		}
 		
-		public void procesa(Decs_una dec) {
-			dec.dec().procesa(this);
+		public void procesa(Decs_una decs) {
+			decs.dec().procesa(this);
 		}
 		
 		public void procesa(Decs_vacia dec) {}
@@ -517,9 +427,11 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		}
 		
 		public void procesa(Pointer p) {
-			if (p.getEnumTipo() == EnumTipo.REF) {
-				Tipo apuntado = p.getApuntado();
-				Ref r = (Ref)apuntado; 
+			Tipo ap = p.getApuntado();
+			
+			if (ap instanceof Ref) {
+				
+				Ref r = (Ref) ap; 
 				if(existeId(r.getId().toString())) {
 					p.setVinculo(valorDe(r.getId().toString()));
 				}
@@ -529,7 +441,7 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 				}
 			}
 			else {
-				p.getTipo().procesa(this);
+				ap.procesa(this);
 			}
 		}
 		
@@ -555,8 +467,6 @@ public class Vinculacion extends ProcesamientoPorDefecto {
 		public void procesa(Pf_ref pf) {
 			pf.getTipo().procesa(this);
 		}
-		
-		
 		
 		
 		

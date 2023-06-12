@@ -5,11 +5,15 @@ import patron_visitor.asint.TinyASint.*;
 public class NodoAST {
 
 	public SL s;
-	public EnumTipo tipo;
+	// public EnumTipo tipo;
+	public Tipo tipo;
 	public NodoAST vinculo;
-	public int nivel;
-	public int dir;
-	public int tam;
+	private int nivel;
+	private int dir;
+	private int tam;
+	private int despl;
+	private int ini; 
+	private int sig;
 
 	public NodoAST() {
 		
@@ -23,11 +27,11 @@ public class NodoAST {
 		this.vinculo = vinculo;
 	}
 	
-	public EnumTipo getTipoNodo() {
+	public Tipo getTipoNodo() {
 		return this.tipo;
 	}
 	
-	public void setTipoNodo(EnumTipo tipo) {
+	public void setTipoNodo(Tipo tipo) {
 		this.tipo = tipo;
 	}
 	
@@ -54,7 +58,31 @@ public class NodoAST {
 	public int getTam() {
 		return this.tam;
 	}
+	
+	public void setDespl(int i) {
+		this.despl = i;
+	}
 
+	public int getDespl() {
+		return this.despl;
+	}
+	
+	public void setIni(int i) {
+		this.ini = i;
+	}
+
+	public int getIni() {
+		return this.ini;
+	}
+	
+	public void setSig(int i) {
+		this.sig = i;
+	}
+
+	public int getSig() {
+		return this.sig;
+	}
+	
 	public String toString() {
 		return "Nodo: " + s.toString(); // Integer.toString(s.fila()) + "-" + Integer.toString(s.col());
 	}

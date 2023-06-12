@@ -1,4 +1,4 @@
-package c_ast_descendente_manual;
+package patron_visitor.c_ast_descendente_manual;
 
 public class GestionErrores {
    public void errorLexico(int fila, int col, String lexema) {

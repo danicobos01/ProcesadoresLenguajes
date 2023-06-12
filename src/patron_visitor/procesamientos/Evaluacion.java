@@ -1,18 +1,14 @@
-package procesamientos;
+package patron_visitor.procesamientos;
 
-import asint.TinyASint.Suma;
-import asint.TinyASint.Resta;
-import asint.TinyASint.Mul;
-import asint.TinyASint.Div;
-import asint.TinyASint.Id;
-import asint.TinyASint.Num;
-import asint.TinyASint.Dec;
-import asint.TinyASint.Decs_muchas;
-import asint.TinyASint.Decs_una;
-import asint.TinyASint.Prog_sin_decs;
-import asint.TinyASint.Prog_con_decs;
-import asint.ProcesamientoPorDefecto;
+import patron_visitor.asint.ProcesamientoPorDefecto;
+import patron_visitor.asint.TinyASint.*;
 import java.util.HashMap;
+
+
+
+/*
+ * 	Clase inoperativa 
+ */
 
 class Valores extends HashMap<String,Double> {}
 
@@ -23,12 +19,12 @@ public class Evaluacion extends ProcesamientoPorDefecto {
        valores = new Valores();
    }
    public void procesa(Prog_sin_decs prog) {
-       prog.exp().procesa(this);
+       prog.getInstrucciones().procesa(this);
        System.out.println(">>>>"+resul);
    }    
    public void procesa(Prog_con_decs prog) {
        prog.decs().procesa(this);
-       prog.exp().procesa(this);
+       prog.getInstrucciones().procesa(this);
        System.out.println(">>>>"+resul);
    }    
    public void procesa(Decs_muchas decs) {
@@ -44,31 +40,31 @@ public class Evaluacion extends ProcesamientoPorDefecto {
                                         ".Fila: "+dec.id().fila()+", col: "+dec.id().col());
        }
         else {
-           valores.put(dec.id().toString(), Double.valueOf(dec.val().toString()).doubleValue());
+           valores.put(dec.id().toString(), Double.valueOf(dec.id().toString()).doubleValue());
         }   
    }
    public void procesa(Suma exp) {
-       exp.arg0().procesa(this);
+       exp.getFirst().procesa(this);
        double v0 = resul;
-       exp.arg1().procesa(this);
+       exp.getSecond().procesa(this);
        resul += v0;
    }
    public void procesa(Resta exp) {
-       exp.arg0().procesa(this);
+       exp.getFirst().procesa(this);
        double v0 = resul;
-       exp.arg1().procesa(this);
+       exp.getSecond().procesa(this);
        resul = v0 - resul;
    }
    public void procesa(Mul exp) {
-       exp.arg0().procesa(this);
+       exp.getFirst().procesa(this);
        double v0 = resul;
-       exp.arg1().procesa(this);
+       exp.getSecond().procesa(this);
        resul *= v0;
    }
    public void procesa(Div exp) {
-       exp.arg0().procesa(this);
+       exp.getFirst().procesa(this);
        double v0 = resul;
-       exp.arg1().procesa(this);
+       exp.getSecond().procesa(this);
        resul = v0 / resul;
    }
    public void procesa(Id exp) {
@@ -79,7 +75,7 @@ public class Evaluacion extends ProcesamientoPorDefecto {
        else 
          resul = val; 
    }
-   public void procesa(Num exp) {
+   public void procesa(NumEnt exp) {
        resul = Double.valueOf(exp.num().toString()).doubleValue();
    }
 }   

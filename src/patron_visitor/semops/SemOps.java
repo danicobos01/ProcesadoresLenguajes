@@ -34,6 +34,6 @@ public class SemOps extends TinyASint {
    
    public Prog prog(Instrucciones ins, Decs decs) {
        if (decs == null) return new Prog_sin_decs(ins);
-       else return new Prog_con_decs(ins,decs);
+       else return new Prog_con_decs(decs,ins);
    }     
 }

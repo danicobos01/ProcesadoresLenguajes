@@ -74,47 +74,7 @@ public class TinyASint {
         public Exp getExp() {
         	return this.arg;
         }
-    }   
-    
-    /*
-    public static class Exp_muchas extends Exp{
-    	Exp exp;
-    	Exp_muchas exps;
-    	
-    	public Exp_muchas(Exp exp, Exp_muchas exps) {
-    		this.exp = exp;
-    		this.exps = exps;
-    	}
-		public void procesa(Procesamiento p) {
-			p.procesa(this);
-		}
-		public Exp getExp();
-    }
-    
-    public static class Exp_una extends Exp{
-    	Exp exp;
-    	public Exp_una(Exp exp) {
-    		this.exp = exp;
-    	}
-    	public void procesa(Procesamiento p) {
-    		p.procesa(this);
-    	}
-    	public Exp getExp() {
-    		return this.exp;
-    	}
-    }
-    
-    public static class Exp_vacia extends Exp{
-    	public Exp_vacia() {
-    		
-    	}
-    	public void procesa(Procesamiento p) {
-    		p.procesa(this);
-    	}
-    }
-    */
-    
-    
+    }       
     
     // Nivel 0: Los operadores relacionales. Todos ellos son operadores binarios,
     // infijos, no asociativos.
@@ -449,6 +409,47 @@ public class TinyASint {
     	public abstract Tipo getTipo();
     }
     
+    public static class OkTipo extends Tipo{
+
+		public OkTipo() {
+			super(EnumTipo.OK);
+		}
+
+		@Override
+		public void procesa(Procesamiento p) {}
+
+		@Override
+		public EnumTipo getEnumTipo() {
+			return EnumTipo.OK;
+		}
+
+		@Override
+		public Tipo getTipo() {
+			return this;
+		}
+    }
+    
+    public static class ErrorTipo extends Tipo{
+
+		public ErrorTipo() {
+			super(EnumTipo.ERROR);
+		}
+
+		@Override
+		public void procesa(Procesamiento p) {}
+
+		@Override
+		public EnumTipo getEnumTipo() {
+			return EnumTipo.ERROR;
+		}
+
+		@Override
+		public Tipo getTipo() {
+			return this;
+		}
+    }
+    
+    
     public static class Int extends Tipo{
     	
     	public Int() {
@@ -582,6 +583,12 @@ public class TinyASint {
 		public Campos getCampos() {
 			return this.campos;
 		}
+		public boolean existeCampo(String id) {
+			return this.campos.existen(id);
+		}
+		public Tipo tipoCampo(String id) {
+			return this.campos.getTipoNodo(id);
+		}
     	
     }
     
@@ -605,9 +612,6 @@ public class TinyASint {
 		}
     	public Tipo getApuntado() {
     		return this.apuntado;
-    	}
-    	public EnumTipo getTipoApuntado() {
-    		return apuntado.getEnumTipo();
     	}
     }
     
@@ -659,6 +663,8 @@ public class TinyASint {
     	public Campos() {
         }
         public abstract void procesa(Procesamiento p);
+        public abstract boolean existen(String id);
+        public abstract Tipo getTipoNodo(String id);
     }
     
     public static class Campos_uno extends Campos{
@@ -671,6 +677,24 @@ public class TinyASint {
 		}
 		public Campo getCampo() {
 			return this.campo;
+		}
+		@Override
+		public boolean existen(String id) {
+			if(id.equals(campo.getId().toString())) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		@Override
+		public Tipo getTipoNodo(String id) {
+			if(existen(id)) {
+				return campo.getTipo();
+			}
+			else {
+				return new ErrorTipo();
+			}
 		}
     }
     
@@ -689,6 +713,25 @@ public class TinyASint {
 		}
 		public Campo getCampo() {
 			return this.campo;
+		}
+		
+		public boolean existen(String id) {
+			this.campos.existen(id);
+			if(id.equals(campo.getId().toString()) && this.campos.existen(id)) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+		
+		public Tipo getTipoNodo(String id) {
+			if (this.campo.getId().toString().equals(id)) {
+				return this.campo.getTipo();
+			}
+			else {
+				return this.campos.getTipoNodo(id);
+			}
 		}
     }
     
@@ -1216,34 +1259,21 @@ public class TinyASint {
     
     public static abstract class Prog  extends NodoAST{
     	
-    	private Decs decs;
-    	private Instrucciones ins;
-    	public Prog(Decs decs, Instrucciones ins) {
-    		this.decs = decs;
-    		this.ins = ins;
-    	}   
-    	
-    	public Prog(Instrucciones ins) {
-    		this.ins = ins;
-    		this.decs = null;
-    	}
-    	
-    	public Decs getDeclaraciones() {
-    		return this.decs;
-    	}
-    	
-    	public Instrucciones getInstrucciones() {
-    		return this.ins;
-    	}
+    	public Prog() {}
        
        public abstract void procesa(Procesamiento p); 
     }
     public static class Prog_sin_decs extends Prog {
       private Instrucciones ins;
        public Prog_sin_decs(Instrucciones ins) {
-          super(ins);
+          super();
           this.ins = ins;
-       }   
+       }
+		
+		public Instrucciones getInstrucciones() {
+			return this.ins;
+		}
+       
        public Instrucciones ins() {return this.ins;}
        public void procesa(Procesamiento p) {
            p.procesa(this); 
@@ -1253,10 +1283,17 @@ public class TinyASint {
       private Instrucciones ins;
       private Decs decs;
        public Prog_con_decs(Decs decs, Instrucciones ins) {
-          super(decs, ins);
+          super();
           this.ins = ins;
           this.decs = decs;
-       }   
+       }
+	   	public Decs getDeclaraciones() {
+			return this.decs;
+		}
+		
+		public Instrucciones getInstrucciones() {
+			return this.ins;
+		}
        public Instrucciones ins() {return this.ins;}
        public Decs decs() {return decs;}
        public void procesa(Procesamiento p) {

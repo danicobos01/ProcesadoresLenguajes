@@ -1,4 +1,4 @@
-package c_ast_descendente_manual;
+package patron_visitor.c_ast_descendente_manual;
 
 import java.io.FileInputStream;
 import java.io.Reader;
